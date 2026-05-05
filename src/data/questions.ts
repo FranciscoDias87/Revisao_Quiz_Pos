@@ -13,7 +13,8 @@ export const quizQuestions: Question[] = [
       "Práticas estritamente fundamentadas na pedagogia crítica desde a colônia.",
       "Ausência de correlação com o contexto histórico-social."
     ],
-    correctAnswer: 1
+    correctAnswer: 1,
+    explanation: "O percurso histórico da educação brasileira é marcado pela herança colonial e por uma visão dualista, onde a educação servia a propósitos diferentes para classes sociais distintas."
   },
   {
     id: 2,
@@ -26,7 +27,8 @@ export const quizQuestions: Question[] = [
       "A veiculação da hegemonia das elites coloniais portuguesas à população.",
       "A criação de sistemas de avaliação em larga escala."
     ],
-    correctAnswer: 2
+    correctAnswer: 2,
+    explanation: "A Companhia de Jesus foi fundamental na consolidação da educação no Brasil colonial, utilizando-a para manter a hegemonia das elites e o controle ideológico religioso."
   },
   {
     id: 3,
@@ -660,7 +662,8 @@ export const quizQuestions: Question[] = [
     block: "Conceitos e Terminologias",
     text: "Onde as dificuldades de aprendizagem costumam ser pontuadas mais intensamente, segundo os textos base?",
     options: ["No ambiente familiar.", "Na escola.", "Em consultas pediátricas.", "Em atividades recreativas."],
-    correctAnswer: 1
+    correctAnswer: 1,
+    explanation: "As dificuldades de aprendizagem tornam-se mais visíveis no ambiente escolar, pois é onde as exigências de sistematização do conhecimento formal ocorrem com maior intensidade."
   },
   {
     id: 52,
@@ -673,7 +676,8 @@ export const quizQuestions: Question[] = [
       "Reduzir o nível de exigência científica para a criança.",
       "Isentar-se da responsabilidade do domínio conceitual."
     ],
-    correctAnswer: 1
+    correctAnswer: 1,
+    explanation: "A escola tem o papel pedagógico de investigar e orientar a superação das dificuldades, em vez de apenas transferir a responsabilidade ou rotular o aluno precocemente."
   },
   {
     id: 53,

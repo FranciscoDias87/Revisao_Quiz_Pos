@@ -12,4 +12,5 @@ export interface Question {
   options: string[];
   correctAnswer: number; // Index of the correct option (0-3)
   block: string;
+  explanation?: string;
 }

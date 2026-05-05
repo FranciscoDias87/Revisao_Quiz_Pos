@@ -38,7 +38,6 @@ export default function App() {
   const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [showFeedback, setShowFeedback] = useState<number | null>(null);
 
   const filteredTopics = useMemo(() => {
     return reviewTopics.filter(t => t.moduleId === selectedModule);
@@ -69,19 +68,14 @@ export default function App() {
   };
 
   const handleAnswer = (questionId: number, optionIndex: number) => {
-    if (showFeedback !== null) return;
-    
     setAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
-    setShowFeedback(optionIndex);
+  };
 
-    setTimeout(() => {
-      setShowFeedback(null);
-      if (currentQuestionIndex < filteredQuestions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-      } else {
-        setView('results');
-      }
-    }, 1200);
+  const getQuestionStatus = (questionId: number) => {
+    if (answers[questionId] === undefined) return 'unanswered';
+    const question = filteredQuestions.find(q => q.id === questionId);
+    if (!question) return 'unanswered';
+    return answers[questionId] === question.correctAnswer ? 'correct' : 'incorrect';
   };
 
   const resetQuiz = () => {
@@ -95,30 +89,30 @@ export default function App() {
       {/* Header */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div 
-          className="flex items-center gap-2 cursor-pointer group"
+          className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
           onClick={() => { setView('home'); setSelectedModule(null); }}
         >
-          <div className="bg-indigo-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
-            <GraduationCap size={20} />
+          <div className="bg-indigo-600 p-1 rounded-lg text-white group-hover:scale-110 transition-transform sm:p-1.5">
+            <GraduationCap size={18} className="sm:w-[20px] sm:h-[20px]" />
           </div>
-          <span className="font-bold text-lg tracking-tight">EduReview</span>
+          <span className="font-bold text-base sm:text-lg tracking-tight">EduReview</span>
         </div>
         
         {selectedModule && (
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             <button 
               onClick={() => setView('review')}
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${view === 'review' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
+              className={`flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium transition-colors ${view === 'review' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
             >
-              <BookOpen size={18} />
-              <span className="hidden sm:inline">Revisão</span>
+              <BookOpen size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden xs:inline">Revisão</span>
             </button>
             <button 
               onClick={() => setView('quiz')}
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${view === 'quiz' || view === 'results' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
+              className={`flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium transition-colors ${view === 'quiz' || view === 'results' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
             >
-              <Layout size={18} />
-              <span className="hidden sm:inline">Simulado</span>
+              <Layout size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden xs:inline">Simulado</span>
             </button>
           </div>
         )}
@@ -135,37 +129,37 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center text-center py-8"
             >
-              <div className="bg-indigo-100 p-4 rounded-full text-indigo-600 mb-6">
-                <GraduationCap size={48} />
+              <div className="bg-indigo-100 p-3 sm:p-4 rounded-full text-indigo-600 mb-6">
+                <GraduationCap size={40} className="sm:w-[48px] sm:h-[48px]" />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-4 px-4">
                 Plataforma de Revisão Pedagógica
               </h1>
-              <p className="text-lg text-slate-600 max-w-2xl mb-12">
+              <p className="text-base sm:text-lg text-slate-600 max-w-2xl mb-8 sm:mb-12 px-6">
                 Selecione um dos módulos abaixo para iniciar sua jornada de revisão teórica e simulados práticos.
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-8 w-full max-w-4xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 w-full max-w-4xl px-2">
                 {(Object.entries(MODULES) as [ModuleId, typeof MODULES['eval']][]).map(([id, mod]) => (
-                  <div key={id} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                    <div className={`p-6 text-white ${id === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
-                      <h3 className="text-xl font-bold mb-1">{mod.title}</h3>
-                      <p className="text-sm text-white/80">{mod.desc}</p>
+                  <div key={id} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className={`p-5 sm:p-6 text-white ${id === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
+                      <h3 className="text-lg sm:text-xl font-bold mb-1">{mod.title}</h3>
+                      <p className="text-xs sm:text-sm text-white/80">{mod.desc}</p>
                     </div>
-                    <div className="p-6 grid grid-cols-2 gap-4">
+                    <div className="p-4 sm:p-6 grid grid-cols-2 gap-3 sm:gap-4">
                       <button 
                         onClick={() => startReview(id)}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:bg-slate-50 transition-all group"
+                        className="flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-indigo-200 hover:bg-slate-50 transition-all group"
                       >
-                        <BookOpen className="text-indigo-600 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Revisão</span>
+                        <BookOpen size={20} className="text-indigo-600 group-hover:scale-110 transition-transform sm:w-[24px] sm:h-[24px]" />
+                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Revisão</span>
                       </button>
                       <button 
                         onClick={() => startQuiz(id)}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-slate-50 transition-all group"
+                        className="flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-slate-50 transition-all group"
                       >
-                        <Layout className="text-emerald-600 group-hover:scale-110 transition-transform" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Simulado</span>
+                        <Layout size={20} className="text-emerald-600 group-hover:scale-110 transition-transform sm:w-[24px] sm:h-[24px]" />
+                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Simulado</span>
                       </button>
                     </div>
                   </div>
@@ -183,63 +177,63 @@ export default function App() {
               exit={{ opacity: 0, x: -20 }}
               className="py-6"
             >
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold flex items-center gap-2">
-                    <BookOpen className="text-indigo-600" />
-                    Revisão: {MODULES[selectedModule].title}
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                    <BookOpen className="text-indigo-600" size={24} />
+                    {MODULES[selectedModule].title}
                   </h2>
                   <p className="text-slate-500 text-sm">Tópico {currentTopicIndex + 1} de {filteredTopics.length}</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 self-end sm:self-auto">
                   <button 
                     disabled={currentTopicIndex === 0}
                     onClick={() => setCurrentTopicIndex(prev => prev - 1)}
-                    className="p-2 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-30"
+                    className="p-2 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-white disabled:opacity-30 transition-colors"
                   >
                     <ChevronLeft />
                   </button>
                   <button 
                     disabled={currentTopicIndex === filteredTopics.length - 1}
                     onClick={() => setCurrentTopicIndex(prev => prev + 1)}
-                    className="p-2 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-30"
+                    className="p-2 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-white disabled:opacity-30 transition-colors"
                   >
                     <ChevronRight />
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-8">
-                <div className={`p-6 text-white ${selectedModule === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
-                  <h3 className="text-xl font-bold">{filteredTopics[currentTopicIndex].title}</h3>
+              <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+                <div className={`p-5 sm:p-6 text-white ${selectedModule === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
+                  <h3 className="text-lg sm:text-xl font-bold">{filteredTopics[currentTopicIndex].title}</h3>
                 </div>
-                <div className="p-8">
-                  <div className="prose prose-slate max-w-none">
-                    <p className="text-lg leading-relaxed text-slate-700 whitespace-pre-wrap">
+                <div className="p-5 sm:p-8">
+                  <div className="max-w-none">
+                    <p className="text-base sm:text-lg leading-relaxed text-slate-700 whitespace-pre-wrap">
                       {filteredTopics[currentTopicIndex].content}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center bg-slate-100 p-4 rounded-2xl">
+              <div className="flex flex-col xs:flex-row justify-between items-center bg-slate-100 p-3 sm:p-4 rounded-2xl gap-3">
                 <button 
                   onClick={() => { setView('home'); setSelectedModule(null); }}
-                  className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
+                  className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium text-sm sm:text-base"
                 >
                   Mudar Módulo
                 </button>
                 {currentTopicIndex === filteredTopics.length - 1 ? (
                   <button 
                     onClick={() => setView('quiz')}
-                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                    className="w-full xs:w-auto px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
                   >
                     Ir para Simulado <ArrowRight size={18} />
                   </button>
                 ) : (
                   <button 
                     onClick={() => setCurrentTopicIndex(prev => prev + 1)}
-                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+                    className="w-full xs:w-auto px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
                   >
                     Próximo Tópico
                   </button>
@@ -257,15 +251,36 @@ export default function App() {
               exit={{ opacity: 0, scale: 1.05 }}
               className="py-6"
             >
+              {/* Question Navigator Grid */}
+              <div className="mb-6 overflow-x-auto pb-2">
+                <div className="flex gap-2 min-w-max">
+                  {filteredQuestions.map((q, idx) => {
+                    const status = answers[q.id] !== undefined 
+                      ? (answers[q.id] === q.correctAnswer ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-rose-500 text-white border-rose-500')
+                      : (currentQuestionIndex === idx ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-400 border-slate-200');
+                    
+                    return (
+                      <button
+                        key={q.id}
+                        onClick={() => setCurrentQuestionIndex(idx)}
+                        className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center font-bold text-sm transition-all flex-shrink-0 ${status} ${currentQuestionIndex === idx ? 'ring-2 ring-indigo-200 ring-offset-2' : ''}`}
+                      >
+                        {idx + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Progress Bar */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <div className="flex justify-between items-end mb-2">
                   <h2 className="text-xl font-bold text-slate-900">Simulado: {MODULES[selectedModule].title}</h2>
                   <span className="text-slate-500 font-mono text-sm">
-                    {currentQuestionIndex + 1}/{filteredQuestions.length}
+                    Questão {currentQuestionIndex + 1}/{filteredQuestions.length}
                   </span>
                 </div>
-                <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentQuestionIndex + 1) / filteredQuestions.length) * 100}%` }}
@@ -275,23 +290,25 @@ export default function App() {
               </div>
 
               {/* Question Card */}
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10">
-                <div className="flex items-center gap-2 text-indigo-600 mb-4 bg-indigo-50 w-fit px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                  <Info size={14} />
+              <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-10 mb-6">
+                <div className="flex items-center gap-2 text-indigo-600 mb-4 bg-indigo-50 w-fit px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                  <Info size={12} className="sm:w-[14px] sm:h-[14px]" />
                   {filteredQuestions[currentQuestionIndex].block}
                 </div>
                 
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-8 leading-snug">
+                <h3 className="text-lg sm:text-2xl font-bold text-slate-800 mb-6 sm:mb-8 leading-snug">
                   {filteredQuestions[currentQuestionIndex].text}
                 </h3>
 
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {filteredQuestions[currentQuestionIndex].options.map((option, idx) => {
-                    const isSelected = showFeedback === idx;
+                    const studentAnswer = answers[filteredQuestions[currentQuestionIndex].id];
+                    const isSelected = studentAnswer === idx;
                     const isCorrect = idx === filteredQuestions[currentQuestionIndex].correctAnswer;
+                    const hasAnswered = studentAnswer !== undefined;
                     
                     let bgClass = "bg-slate-50 border-slate-200 hover:border-indigo-300 hover:bg-white";
-                    if (showFeedback !== null) {
+                    if (hasAnswered) {
                       if (isCorrect) bgClass = "bg-emerald-50 border-emerald-500 text-emerald-900";
                       else if (isSelected) bgClass = "bg-rose-50 border-rose-500 text-rose-900";
                       else bgClass = "bg-slate-50 border-slate-200 opacity-50";
@@ -300,25 +317,72 @@ export default function App() {
                     return (
                       <button
                         key={idx}
-                        disabled={showFeedback !== null}
+                        disabled={hasAnswered}
                         onClick={() => handleAnswer(filteredQuestions[currentQuestionIndex].id, idx)}
-                        className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex items-start gap-4 ${bgClass}`}
+                        className={`w-full text-left p-3 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all flex items-start gap-3 sm:gap-4 ${bgClass}`}
                       >
-                        <span className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm ${isSelected ? 'border-current' : 'border-slate-300'}`}>
+                        <span className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs sm:text-sm ${isSelected ? 'border-current' : 'border-slate-300'}`}>
                           {String.fromCharCode(65 + idx)}
                         </span>
-                        <span className="text-base sm:text-lg">{option}</span>
+                        <span className="text-sm sm:text-lg flex-grow py-0.5">{option}</span>
+                        {hasAnswered && isCorrect && <CheckCircle2 className="text-emerald-500 mt-1" size={20} />}
                       </button>
                     );
                   })}
                 </div>
+
+                {/* Explanation */}
+                {answers[filteredQuestions[currentQuestionIndex].id] !== undefined && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl"
+                  >
+                    <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                      <Info size={18} className="text-indigo-600" />
+                      Explicação:
+                    </h4>
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                      {filteredQuestions[currentQuestionIndex].explanation || 
+                       `A alternativa correta é a "${String.fromCharCode(65 + filteredQuestions[currentQuestionIndex].correctAnswer)}". Esta questão aborda conceitos de ${filteredQuestions[currentQuestionIndex].block}.`}
+                    </p>
+                  </motion.div>
+                )}
               </div>
 
-              <div className="mt-8 flex justify-between items-center text-slate-500 px-2">
-                <p className="text-sm">Selecione para avançar.</p>
+              {/* Navigation Controls */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button 
+                    disabled={currentQuestionIndex === 0}
+                    onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
+                    className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={20} /> Anterior
+                  </button>
+                  <button 
+                    disabled={currentQuestionIndex === filteredQuestions.length - 1}
+                    onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
+                    className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-30 transition-colors flex items-center justify-center gap-2"
+                  >
+                    Próximo <ChevronRight size={20} />
+                  </button>
+                </div>
+
+                {Object.keys(answers).length === filteredQuestions.length && (
+                  <button 
+                    onClick={() => setView('results')}
+                    className="w-full sm:w-auto px-10 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all transform hover:scale-105"
+                  >
+                    Finalizar Simulado
+                  </button>
+                )}
+              </div>
+
+              <div className="mt-8 flex justify-center text-slate-500">
                 <button 
                   onClick={() => { setView('home'); setSelectedModule(null); }}
-                  className="text-sm font-medium hover:text-slate-900 flex items-center gap-1"
+                  className="text-sm font-medium hover:text-slate-900 flex items-center gap-1 border-b border-transparent hover:border-slate-400 transition-all"
                 >
                   Sair do Quiz
                 </button>
@@ -335,24 +399,24 @@ export default function App() {
               exit={{ opacity: 0, y: -30 }}
               className="py-12 flex flex-col items-center"
             >
-              <div className="relative mb-8">
+              <div className="relative mb-6 sm:mb-8">
                 <div className="absolute inset-0 bg-indigo-200 blur-2xl rounded-full opacity-50 animate-pulse"></div>
-                <div className="relative bg-white p-8 rounded-full border-4 border-indigo-600 text-indigo-600">
-                  <Trophy size={64} />
+                <div className="relative bg-white p-6 sm:p-8 rounded-full border-4 border-indigo-600 text-indigo-600">
+                  <Trophy size={48} className="sm:w-[64px] sm:h-[64px]" />
                 </div>
               </div>
 
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Resultado Final</h2>
-              <p className="text-slate-500 mb-8">Simulado: {MODULES[selectedModule].title}</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Resultado Final</h2>
+              <p className="text-slate-500 mb-6 sm:mb-8 text-center px-4">Simulado: {MODULES[selectedModule].title}</p>
 
-              <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-12">
-                <div className="bg-white p-6 rounded-3xl border border-slate-200 text-center">
-                  <div className="text-4xl font-black text-indigo-600 mb-1">{score}</div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Acertos</div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-sm mb-8 sm:mb-12 px-4">
+                <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 text-center shadow-sm">
+                  <div className="text-3xl sm:text-4xl font-black text-indigo-600 mb-1">{score}</div>
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">Acertos</div>
                 </div>
-                <div className="bg-white p-6 rounded-3xl border border-slate-200 text-center">
-                  <div className="text-4xl font-black text-slate-900 mb-1">{Math.round((score / filteredQuestions.length) * 100)}%</div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Precisão</div>
+                <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 text-center shadow-sm">
+                  <div className="text-3xl sm:text-4xl font-black text-slate-900 mb-1">{Math.round((score / filteredQuestions.length) * 100)}%</div>
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">Precisão</div>
                 </div>
               </div>
 
@@ -368,16 +432,16 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+              <div className="flex flex-col sm:flex-row gap-4 w-full max-w-lg px-4">
                 <button 
                   onClick={resetQuiz}
-                  className="flex-1 bg-indigo-600 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg"
+                  className="w-full bg-indigo-600 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100"
                 >
                   <RotateCcw size={20} /> Refazer Simulado
                 </button>
                 <button 
                   onClick={() => { setView('home'); setSelectedModule(null); }}
-                  className="flex-1 bg-white border border-slate-200 text-slate-700 p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
+                  className="w-full bg-white border border-slate-200 text-slate-700 p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
                 >
                   <Home size={20} /> Outros Módulos
                 </button>

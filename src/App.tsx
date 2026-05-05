@@ -17,20 +17,56 @@ import { reviewTopics } from './data/content';
 import { quizQuestions } from './data/questions';
 
 type View = 'home' | 'review' | 'quiz' | 'results';
+type ModuleId = 'eval' | 'disorders';
+
+const MODULES: Record<ModuleId, { title: string; desc: string; icon: string }> = {
+  eval: {
+    title: 'Paradigmas da Avaliação',
+    desc: 'Avaliação, currículo e políticas educacionais brasileiras.',
+    icon: 'eval'
+  },
+  disorders: {
+    title: 'Dificuldades e Transtornos',
+    desc: 'Concepções, aspectos neurológicos e transtornos específicos.',
+    icon: 'disorders'
+  }
+};
 
 export default function App() {
   const [view, setView] = useState<View>('home');
+  const [selectedModule, setSelectedModule] = useState<ModuleId | null>(null);
   const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [showFeedback, setShowFeedback] = useState<number | null>(null);
 
+  const filteredTopics = useMemo(() => {
+    return reviewTopics.filter(t => t.moduleId === selectedModule);
+  }, [selectedModule]);
+
+  const filteredQuestions = useMemo(() => {
+    return quizQuestions.filter(q => q.moduleId === selectedModule);
+  }, [selectedModule]);
+
   const score = useMemo(() => {
     return Object.entries(answers).reduce((acc, [qId, answerIndex]) => {
-      const question = quizQuestions.find(q => q.id === parseInt(qId));
+      const question = filteredQuestions.find(q => q.id === parseInt(qId));
       return question && question.correctAnswer === answerIndex ? acc + 1 : acc;
     }, 0);
-  }, [answers]);
+  }, [answers, filteredQuestions]);
+
+  const startReview = (moduleId: ModuleId) => {
+    setSelectedModule(moduleId);
+    setCurrentTopicIndex(0);
+    setView('review');
+  };
+
+  const startQuiz = (moduleId: ModuleId) => {
+    setSelectedModule(moduleId);
+    setAnswers({});
+    setCurrentQuestionIndex(0);
+    setView('quiz');
+  };
 
   const handleAnswer = (questionId: number, optionIndex: number) => {
     if (showFeedback !== null) return;
@@ -40,7 +76,7 @@ export default function App() {
 
     setTimeout(() => {
       setShowFeedback(null);
-      if (currentQuestionIndex < quizQuestions.length - 1) {
+      if (currentQuestionIndex < filteredQuestions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
         setView('results');
@@ -60,7 +96,7 @@ export default function App() {
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div 
           className="flex items-center gap-2 cursor-pointer group"
-          onClick={() => setView('home')}
+          onClick={() => { setView('home'); setSelectedModule(null); }}
         >
           <div className="bg-indigo-600 p-1.5 rounded-lg text-white group-hover:scale-110 transition-transform">
             <GraduationCap size={20} />
@@ -68,22 +104,24 @@ export default function App() {
           <span className="font-bold text-lg tracking-tight">EduReview</span>
         </div>
         
-        <div className="flex gap-4">
-          <button 
-            onClick={() => setView('review')}
-            className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${view === 'review' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
-          >
-            <BookOpen size={18} />
-            <span className="hidden sm:inline">Revisão</span>
-          </button>
-          <button 
-            onClick={() => setView('quiz')}
-            className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${view === 'quiz' || view === 'results' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
-          >
-            <Layout size={18} />
-            <span className="hidden sm:inline">Simulado</span>
-          </button>
-        </div>
+        {selectedModule && (
+          <div className="flex gap-4">
+            <button 
+              onClick={() => setView('review')}
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${view === 'review' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
+            >
+              <BookOpen size={18} />
+              <span className="hidden sm:inline">Revisão</span>
+            </button>
+            <button 
+              onClick={() => setView('quiz')}
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${view === 'quiz' || view === 'results' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
+            >
+              <Layout size={18} />
+              <span className="hidden sm:inline">Simulado</span>
+            </button>
+          </div>
+        )}
       </nav>
 
       <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -95,56 +133,49 @@ export default function App() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="flex flex-col items-center text-center py-12"
+              className="flex flex-col items-center text-center py-8"
             >
               <div className="bg-indigo-100 p-4 rounded-full text-indigo-600 mb-6">
                 <GraduationCap size={48} />
               </div>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
-                Paradigmas da Avaliação da Aprendizagem
+                Plataforma de Revisão Pedagógica
               </h1>
               <p className="text-lg text-slate-600 max-w-2xl mb-12">
-                Aprofunde seus conhecimentos sobre currículo, avaliação e políticas educacionais brasileiras através desta revisão teórica e simulado completo.
+                Selecione um dos módulos abaixo para iniciar sua jornada de revisão teórica e simulados práticos.
               </p>
 
-              <div className="grid sm:grid-cols-2 gap-6 w-full max-w-2xl">
-                <button 
-                  onClick={() => setView('review')}
-                  className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all text-left flex flex-col group"
-                >
-                  <div className="bg-indigo-50 p-3 rounded-xl text-indigo-600 w-fit mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <BookOpen size={24} />
+              <div className="grid sm:grid-cols-2 gap-8 w-full max-w-4xl">
+                {(Object.entries(MODULES) as [ModuleId, typeof MODULES['eval']][]).map(([id, mod]) => (
+                  <div key={id} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                    <div className={`p-6 text-white ${id === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
+                      <h3 className="text-xl font-bold mb-1">{mod.title}</h3>
+                      <p className="text-sm text-white/80">{mod.desc}</p>
+                    </div>
+                    <div className="p-6 grid grid-cols-2 gap-4">
+                      <button 
+                        onClick={() => startReview(id)}
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-100 hover:border-indigo-200 hover:bg-slate-50 transition-all group"
+                      >
+                        <BookOpen className="text-indigo-600 group-hover:scale-110 transition-transform" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Revisão</span>
+                      </button>
+                      <button 
+                        onClick={() => startQuiz(id)}
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-slate-50 transition-all group"
+                      >
+                        <Layout className="text-emerald-600 group-hover:scale-110 transition-transform" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Simulado</span>
+                      </button>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-xl mb-2">Revisão Teórica</h3>
-                  <p className="text-slate-500 text-sm flex-grow">
-                    6 blocos de conteúdo fundamentados nos paradigmas de avaliação e LDB.
-                  </p>
-                  <div className="mt-4 flex items-center text-indigo-600 font-semibold gap-1">
-                    Começar leitura <ArrowRight size={16} />
-                  </div>
-                </button>
-
-                <button 
-                  onClick={() => setView('quiz')}
-                  className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all text-left flex flex-col group"
-                >
-                  <div className="bg-emerald-50 p-3 rounded-xl text-emerald-600 w-fit mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <Layout size={24} />
-                  </div>
-                  <h3 className="font-bold text-xl mb-2">Simulado Completo</h3>
-                  <p className="text-slate-500 text-sm flex-grow">
-                    50 questões inéditas divididas por blocos temáticos conforme o conteúdo.
-                  </p>
-                  <div className="mt-4 flex items-center text-emerald-600 font-semibold gap-1">
-                    Iniciar quiz <ArrowRight size={16} />
-                  </div>
-                </button>
+                ))}
               </div>
             </motion.div>
           )}
 
           {/* REVIEW VIEW */}
-          {view === 'review' && (
+          {view === 'review' && selectedModule && (
             <motion.div 
               key="review"
               initial={{ opacity: 0, x: 20 }}
@@ -156,9 +187,9 @@ export default function App() {
                 <div>
                   <h2 className="text-2xl font-bold flex items-center gap-2">
                     <BookOpen className="text-indigo-600" />
-                    Revisão Teórica
+                    Revisão: {MODULES[selectedModule].title}
                   </h2>
-                  <p className="text-slate-500 text-sm">Aula {currentTopicIndex + 1} de {reviewTopics.length}</p>
+                  <p className="text-slate-500 text-sm">Tópico {currentTopicIndex + 1} de {filteredTopics.length}</p>
                 </div>
                 <div className="flex gap-2">
                   <button 
@@ -169,7 +200,7 @@ export default function App() {
                     <ChevronLeft />
                   </button>
                   <button 
-                    disabled={currentTopicIndex === reviewTopics.length - 1}
+                    disabled={currentTopicIndex === filteredTopics.length - 1}
                     onClick={() => setCurrentTopicIndex(prev => prev + 1)}
                     className="p-2 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-30"
                   >
@@ -179,13 +210,13 @@ export default function App() {
               </div>
 
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-8">
-                <div className="bg-indigo-600 p-6 text-white">
-                  <h3 className="text-xl font-bold">{reviewTopics[currentTopicIndex].title}</h3>
+                <div className={`p-6 text-white ${selectedModule === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
+                  <h3 className="text-xl font-bold">{filteredTopics[currentTopicIndex].title}</h3>
                 </div>
                 <div className="p-8">
                   <div className="prose prose-slate max-w-none">
                     <p className="text-lg leading-relaxed text-slate-700 whitespace-pre-wrap">
-                      {reviewTopics[currentTopicIndex].content}
+                      {filteredTopics[currentTopicIndex].content}
                     </p>
                   </div>
                 </div>
@@ -193,24 +224,24 @@ export default function App() {
 
               <div className="flex justify-between items-center bg-slate-100 p-4 rounded-2xl">
                 <button 
-                  onClick={() => setView('home')}
+                  onClick={() => { setView('home'); setSelectedModule(null); }}
                   className="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
                 >
-                  Voltar ao Início
+                  Mudar Módulo
                 </button>
-                {currentTopicIndex === reviewTopics.length - 1 ? (
+                {currentTopicIndex === filteredTopics.length - 1 ? (
                   <button 
                     onClick={() => setView('quiz')}
                     className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-colors flex items-center gap-2"
                   >
-                    Ir para o Simulado <ArrowRight size={18} />
+                    Ir para Simulado <ArrowRight size={18} />
                   </button>
                 ) : (
                   <button 
                     onClick={() => setCurrentTopicIndex(prev => prev + 1)}
                     className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
                   >
-                    Próximo Bloco
+                    Próximo Tópico
                   </button>
                 )}
               </div>
@@ -218,7 +249,7 @@ export default function App() {
           )}
 
           {/* QUIZ VIEW */}
-          {view === 'quiz' && (
+          {view === 'quiz' && selectedModule && (
             <motion.div 
               key="quiz"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -229,15 +260,15 @@ export default function App() {
               {/* Progress Bar */}
               <div className="mb-8">
                 <div className="flex justify-between items-end mb-2">
-                  <h2 className="text-xl font-bold text-slate-900">Simulado</h2>
+                  <h2 className="text-xl font-bold text-slate-900">Simulado: {MODULES[selectedModule].title}</h2>
                   <span className="text-slate-500 font-mono text-sm">
-                    {currentQuestionIndex + 1}/{quizQuestions.length}
+                    {currentQuestionIndex + 1}/{filteredQuestions.length}
                   </span>
                 </div>
                 <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: `${((currentQuestionIndex + 1) / quizQuestions.length) * 100}%` }}
+                    animate={{ width: `${((currentQuestionIndex + 1) / filteredQuestions.length) * 100}%` }}
                     className="h-full bg-indigo-600"
                   />
                 </div>
@@ -247,17 +278,17 @@ export default function App() {
               <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10">
                 <div className="flex items-center gap-2 text-indigo-600 mb-4 bg-indigo-50 w-fit px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                   <Info size={14} />
-                  {quizQuestions[currentQuestionIndex].block}
+                  {filteredQuestions[currentQuestionIndex].block}
                 </div>
                 
                 <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-8 leading-snug">
-                  {quizQuestions[currentQuestionIndex].text}
+                  {filteredQuestions[currentQuestionIndex].text}
                 </h3>
 
                 <div className="space-y-3">
-                  {quizQuestions[currentQuestionIndex].options.map((option, idx) => {
+                  {filteredQuestions[currentQuestionIndex].options.map((option, idx) => {
                     const isSelected = showFeedback === idx;
-                    const isCorrect = idx === quizQuestions[currentQuestionIndex].correctAnswer;
+                    const isCorrect = idx === filteredQuestions[currentQuestionIndex].correctAnswer;
                     
                     let bgClass = "bg-slate-50 border-slate-200 hover:border-indigo-300 hover:bg-white";
                     if (showFeedback !== null) {
@@ -270,7 +301,7 @@ export default function App() {
                       <button
                         key={idx}
                         disabled={showFeedback !== null}
-                        onClick={() => handleAnswer(quizQuestions[currentQuestionIndex].id, idx)}
+                        onClick={() => handleAnswer(filteredQuestions[currentQuestionIndex].id, idx)}
                         className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all flex items-start gap-4 ${bgClass}`}
                       >
                         <span className={`flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm ${isSelected ? 'border-current' : 'border-slate-300'}`}>
@@ -284,9 +315,9 @@ export default function App() {
               </div>
 
               <div className="mt-8 flex justify-between items-center text-slate-500 px-2">
-                <p className="text-sm">Clique na opção correta para avançar automaticamente.</p>
+                <p className="text-sm">Selecione para avançar.</p>
                 <button 
-                  onClick={() => setView('home')}
+                  onClick={() => { setView('home'); setSelectedModule(null); }}
                   className="text-sm font-medium hover:text-slate-900 flex items-center gap-1"
                 >
                   Sair do Quiz
@@ -296,7 +327,7 @@ export default function App() {
           )}
 
           {/* RESULTS VIEW */}
-          {view === 'results' && (
+          {view === 'results' && selectedModule && (
             <motion.div 
               key="results"
               initial={{ opacity: 0, y: 30 }}
@@ -312,7 +343,7 @@ export default function App() {
               </div>
 
               <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Resultado Final</h2>
-              <p className="text-slate-500 mb-8">Você concluiu o simulado de 50 questões.</p>
+              <p className="text-slate-500 mb-8">Simulado: {MODULES[selectedModule].title}</p>
 
               <div className="grid grid-cols-2 gap-4 w-full max-w-sm mb-12">
                 <div className="bg-white p-6 rounded-3xl border border-slate-200 text-center">
@@ -320,35 +351,35 @@ export default function App() {
                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Acertos</div>
                 </div>
                 <div className="bg-white p-6 rounded-3xl border border-slate-200 text-center">
-                  <div className="text-4xl font-black text-slate-900 mb-1">{Math.round((score / quizQuestions.length) * 100)}%</div>
+                  <div className="text-4xl font-black text-slate-900 mb-1">{Math.round((score / filteredQuestions.length) * 100)}%</div>
                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Precisão</div>
                 </div>
               </div>
 
-              <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-3xl w-full max-w-lg mb-12">
-                <h4 className="font-bold text-indigo-800 mb-2 flex items-center gap-2">
+              <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-3xl w-full max-w-lg mb-12 text-center">
+                <h4 className="font-bold text-indigo-800 mb-2 flex items-center justify-center gap-2">
                   <CheckCircle2 size={18} />
-                  Feedback de Estudo
+                  Performance
                 </h4>
                 <p className="text-indigo-700 text-sm leading-relaxed">
-                  {score >= 45 ? "Excelente! Você demonstra domínio absoluto dos temas de avaliação e legislação. Está pronto para o exame!" : 
-                   score >= 35 ? "Bom desempenho. Você compreende bem os conceitos, mas uma revisão rápida nos blocos onde teve dúvida pode ajudar a consolidar." : 
-                   "O conteúdo é denso e histórico. Recomendamos reler a seção de revisão e refazer o quiz para fixar os marcos regulatórios e pedagógicos."}
+                  {score >= (filteredQuestions.length * 0.9) ? "Excelente! Você demonstra domínio absoluto deste módulo." : 
+                   score >= (filteredQuestions.length * 0.7) ? "Bom desempenho. Você compreende bem os conceitos fundamentais." : 
+                   "Continue estudando! Recomendamos rever a revisão teórica deste módulo."}
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 w-full max-w-lg">
                 <button 
                   onClick={resetQuiz}
-                  className="flex-1 bg-indigo-600 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100"
+                  className="flex-1 bg-indigo-600 text-white p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors shadow-lg"
                 >
-                  <RotateCcw size={20} /> Tentar Novamente
+                  <RotateCcw size={20} /> Refazer Simulado
                 </button>
                 <button 
-                  onClick={() => setView('home')}
+                  onClick={() => { setView('home'); setSelectedModule(null); }}
                   className="flex-1 bg-white border border-slate-200 text-slate-700 p-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
                 >
-                  <Home size={20} /> Voltar ao Início
+                  <Home size={20} /> Outros Módulos
                 </button>
               </div>
             </motion.div>
@@ -358,7 +389,7 @@ export default function App() {
 
       <footer className="mt-12 py-8 border-t border-slate-200 text-center">
         <p className="text-slate-400 text-sm">
-          EduReview © 2024 - Paradigmas da Avaliação da Aprendizagem
+          EduReview © 2024 - Plataforma de Estudo e Revisão
         </p>
       </footer>
     </div>

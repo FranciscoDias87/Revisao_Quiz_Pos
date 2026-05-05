@@ -1,9 +1,10 @@
 import { Question } from '../types';
 
 export const quizQuestions: Question[] = [
-  // BLOCO 1
+  // MÓDULO 1: Paradigmas da Avaliação (IDs 1-50)
   {
     id: 1,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "Segundo os textos, a cultura da avaliação da aprendizagem no Brasil carrega:",
     options: [
@@ -16,6 +17,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 2,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "A prática de catequização promovida pela Companhia de Jesus no Brasil colonial teve como um de seus papéis históricos:",
     options: [
@@ -28,6 +30,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 3,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "O modelo aristocrático e o regime escravocrata do passado brasileiro deixaram heranças que se expressam até hoje em:",
     options: [
@@ -40,6 +43,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 4,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "Na análise da avaliação escolar brasileira, a herança cultural do ensino foi marcada por:",
     options: [
@@ -52,6 +56,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 5,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "O propósito de analisar o percurso histórico da avaliação não é apenas compreender o passado, mas principalmente:",
     options: [
@@ -64,6 +69,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 6,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "Sobre o direito à educação ao longo da história, ele foi estruturado de forma:",
     options: [
@@ -76,6 +82,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 7,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "No período colonial, além da instrução elementar, a educação formal servia para:",
     options: [
@@ -88,6 +95,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 8,
+    moduleId: 'eval',
     block: "História da Avaliação",
     text: "A concepção de educação que busca ser contra-hegemônica foca na:",
     options: [
@@ -98,9 +106,9 @@ export const quizQuestions: Question[] = [
     ],
     correctAnswer: 2
   },
-  // BLOCO 2
   {
     id: 9,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "O currículo contemporâneo é conceituado como:",
     options: [
@@ -113,6 +121,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 10,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "Quando se afirma que o currículo atua como um veículo de seleção cultural, entende-se que:",
     options: [
@@ -125,18 +134,20 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 11,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "A característica de fragmentação e especialização do conhecimento presente nos currículos é proveniente da:",
     options: [
       "Cultura indígena local.",
       "Pedagogia libertadora.",
-      "Cultura industrial e divisão social do trabalho.",
+      "Cultura industrial e division social do trabalho.",
       "Influência jesuítica no século XVIII."
     ],
     correctAnswer: 2
   },
   {
     id: 12,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "A expulsão da Companhia de Jesus (1759) do Brasil fez com que:",
     options: [
@@ -149,6 +160,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 13,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "Analisar o currículo é também analisar:",
     options: [
@@ -161,6 +173,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 14,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "O currículo deixou de ser apenas um instrumento microescolar para se tornar:",
     options: [
@@ -173,6 +186,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 15,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "O conhecimento fragmentado nas escolas acompanha o desenvolvimento global desde o século XVIII, período este fortemente marcado pela:",
     options: [
@@ -185,19 +199,20 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 16,
+    moduleId: 'eval',
     block: "Currículo e Sociedade",
     text: "A normatização prescritiva do currículo serve historicamente como:",
     options: [
       "Apenas sugestão teórica sem aplicação prática.",
       "Ferramenta orientadora do processo de ensino-aprendizagem.",
       "Fator de desregulamentação da escola pública.",
-      "Mecanismo de subversão docente contra o Estado."
+      "Mecanismo de subversão docente contra o State."
     ],
     correctAnswer: 1
   },
-  // BLOCO 3
   {
     id: 17,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "A educação como direito público no início do Brasil república/industrialização atendeu a:",
     options: [
@@ -210,6 +225,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 18,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "As avaliações podem ser fundamentadas por diversas concepções pedagógicas. Qual das alternativas cita concepções apontadas na aula 3?",
     options: [
@@ -222,8 +238,9 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 19,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
-    text: "O Estado moderno utilizou a expansão escolar com a concepção liberal de criar um eleitorado 'esclarecido' visando:",
+    text: "O State moderno utilizou a expansão escolar com a concepção liberal de criar um eleitorado 'esclarecido' visando:",
     options: [
       "A derrubada do modelo republicano.",
       "Evitar riscos à preservação da liberdade do mercado competitivo.",
@@ -234,6 +251,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 20,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "A educação pública assumiu um caráter protetivo sobre as crianças, que na virada para o século XX enfrentavam:",
     options: [
@@ -246,11 +264,12 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 21,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "O fortalecimento da educação como direito humano subjetivo no Brasil é:",
     options: [
       "Responsabilidade primária da iniciativa privada.",
-      "Papel que tem sido cobrado e assumido historicamente pelo Estado.",
+      "Papel que tem sido cobrado e assumido historicamente pelo State.",
       "Um conceito abandonado pela LDB de 1996.",
       "Inexistente em nossa história normativa."
     ],
@@ -258,6 +277,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 22,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "A concepção de 'cidadania' que moldou a educação de massas carregava um princípio de igualdade:",
     options: [
@@ -270,6 +290,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 23,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "Uma avaliação com características formativas e emancipatórias visa:",
     options: [
@@ -282,6 +303,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 24,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "A concepção construtivista de avaliação entende que o conhecimento:",
     options: [
@@ -294,6 +316,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 25,
+    moduleId: 'eval',
     block: "Qualidade Educacional",
     text: "A busca por qualidade na educação no contexto histórico analisado:",
     options: [
@@ -304,9 +327,9 @@ export const quizQuestions: Question[] = [
     ],
     correctAnswer: 1
   },
-  // BLOCO 4
   {
     id: 26,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "As reformas curriculares recentes, baseadas na 'pedagogia das competências', foram impulsionadas por:",
     options: [
@@ -319,6 +342,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 27,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "Organismos como UNESCO, UNICEF, Banco Mundial e OIT têm tido o papel de:",
     options: [
@@ -331,6 +355,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 28,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "As diretrizes estabelecidas na era contemporânea (após os anos 1990) apontam para a subordinação das políticas educacionais nacionais a:",
     options: [
@@ -343,6 +368,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 29,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "A 'pedagogia das competências' busca formar um perfil de trabalhador capaz de:",
     options: [
@@ -355,6 +381,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 30,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "A reconfiguração curricular baseada em competências influencia diretamente:",
     options: [
@@ -367,6 +394,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 31,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "O estabelecimento de um 'currículo de base comum' no Brasil atual é reflexo de um projeto delineado, em grande parte, por:",
     options: [
@@ -379,6 +407,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 32,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
     text: "O que inaugura a chamada 'era das diretrizes' nas reformas educacionais latino-americanas?",
     options: [
@@ -391,8 +420,9 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 33,
+    moduleId: 'eval',
     block: "Pedagogia das Competências",
-    text: "Qual é o principal cenário promovido pelas atuais reformas orientadas por competências?",
+    text: "Qual é the principal cenário promovido pelas atuais reformas orientadas por competências?",
     options: [
       "Fim das tensões e disputas no campo educacional.",
       "Acirramento das disputas no campo da política educacional nacional e desregulamentação de direitos.",
@@ -401,9 +431,9 @@ export const quizQuestions: Question[] = [
     ],
     correctAnswer: 1
   },
-  // BLOCO 5
   {
     id: 34,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "A lógica que permeia a criação de sistemas padronizados de avaliação a partir da década de 1970 no mundo é a:",
     options: [
@@ -416,6 +446,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 35,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "No Brasil, qual foi a primeira experiência de implementação de uma avaliação padronizada (diagnóstica)?",
     options: [
@@ -428,6 +459,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 36,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "O SAEB tem como uma de suas matrizes inspiradoras e metodológicas o:",
     options: [
@@ -440,6 +472,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 37,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "Os dados do Projeto Edurural (1987) demonstraram claramente que a qualidade educacional sofria forte impacto de fatores como:",
     options: [
@@ -452,10 +485,11 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 38,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "As políticas de 'accountability' que vêm crescendo no cenário educacional significam, no contexto das reformas:",
     options: [
-      "Desresponsabilização do Estado sobre as verbas.",
+      "Desresponsabilização do State sobre as verbas.",
       "Políticas de prestação de contas e responsabilização pelos resultados com base em índices de avaliação.",
       "Modelos contábeis ensinados aos alunos no ensino fundamental.",
       "Banimento dos currículos de base comum."
@@ -464,6 +498,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 39,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "O desempenho escolar, segundo as pesquisas que deram base à estruturação de avaliações, acompanha diretamente as:",
     options: [
@@ -476,6 +511,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 40,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "O PISA e as avaliações que nele se inspiram costumam privilegiar a mensuração de:",
     options: [
@@ -488,6 +524,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 41,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "A estruturação do sistema nacional de avaliação da aprendizagem atual no Brasil articula-se organicamente com a implementação do(a):",
     options: [
@@ -500,6 +537,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 42,
+    moduleId: 'eval',
     block: "Avaliação em Larga Escala",
     text: "As atuais medidas da política educacional, como a possibilidade de Ensino a Distância (EAD) no Ensino Médio, somadas à forte medição por índices, evidenciam:",
     options: [
@@ -510,9 +548,9 @@ export const quizQuestions: Question[] = [
     ],
     correctAnswer: 1
   },
-  // BLOCO 6
   {
     id: 43,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "A Lei de Diretrizes e Bases da Educação Nacional (Lei 9.394/1996) entende o papel do docente em relação à avaliação escolar como:",
     options: [
@@ -525,6 +563,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 44,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "A LDB preconiza, em seu Art. 14, que a gestão escolar pública deve adotar o modelo de:",
     options: [
@@ -537,6 +576,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 45,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "A reprovação escolar, segundo as discussões pautadas após a LDB:",
     options: [
@@ -549,6 +589,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 46,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "Segundo as diretrizes da LDB, o trabalho docente é caracterizado como:",
     options: [
@@ -561,6 +602,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 47,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "A liberdade na construção do Projeto Político-Pedagógico (PPP) pelas escolas é considerada:",
     options: [
@@ -573,6 +615,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 48,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "A avaliação da aprendizagem, na perspectiva legal da LDB (1996), é um retrato da:",
     options: [
@@ -585,6 +628,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 49,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "Quando a avaliação é compreendida no ciclo do 'fazer e refazer' no cotidiano escolar, ela atua de maneira:",
     options: [
@@ -597,6 +641,7 @@ export const quizQuestions: Question[] = [
   },
   {
     id: 50,
+    moduleId: 'eval',
     block: "Avaliação e LDB",
     text: "Estudos sobre os marcos normativos posteriores à LDB de 1996 indicam que as recentes reformas curriculares (como as iniciadas em 2016):",
     options: [
@@ -604,6 +649,503 @@ export const quizQuestions: Question[] = [
       "Produzem tensionamentos e elementos muitas vezes contrários aos princípios de autonomia e gestão democrática da LDB.",
       "Foram construídas exclusivamente por alunos do ensino médio.",
       "Excluíram por completo as avaliações de sistema (como o SAEB) do Brasil."
+    ],
+    correctAnswer: 1
+  },
+
+  // MÓDULO 2: Dificuldades e Transtornos de Aprendizagem (IDs 51-100)
+  {
+    id: 51,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "Onde as dificuldades de aprendizagem costumam ser pontuadas mais intensamente, segundo os textos base?",
+    options: ["No ambiente familiar.", "Na escola.", "Em consultas pediátricas.", "Em atividades recreativas."],
+    correctAnswer: 1
+  },
+  {
+    id: 52,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "Ao deparar-se com dificuldades no aluno, cabe à escola principalmente:",
+    options: [
+      "Encaminhá-lo imediatamente para educação especial.",
+      "Entender como a dificuldade se caracteriza e orientar a superação.",
+      "Reduzir o nível de exigência científica para a criança.",
+      "Isentar-se da responsabilidade do domínio conceitual."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 53,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "O pensamento de quais filósofos embasa a construção histórica dos conceitos de aprendizagem citados na literatura?",
+    options: ["Sócrates e Aristóteles apenas.", "Platão e Aristóteles.", "Kant e Hegel.", "Piaget e Vygotsky."],
+    correctAnswer: 1
+  },
+  {
+    id: 54,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "Os termos 'dificuldade', 'distúrbio' e 'transtorno' envolvem diferentes ênfases teóricas que valorizam:",
+    options: ["Fatores exclusivamente pedagógicos.", "Fatores unicamente espirituais.", "Fatores sociais ou biológicos.", "Fatores puramente econômicos."],
+    correctAnswer: 2
+  },
+  {
+    id: 55,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "Segundo Drouet (2000), os distúrbios da fala, audição e comportamento constituem-se em:",
+    options: [
+      "Falhas de caráter da criança.",
+      "Obstáculos à aprendizagem, que podem prejudicá-la ou impedi-la.",
+      "Fatores normais que não exigem atenção especial.",
+      "Condições temporárias que se resolvem sem intervenção."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 56,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "Em relação às terminologias adotadas por diversos autores, nota-se que:",
+    options: [
+      "Há um consenso absoluto sobre o uso da palavra 'distúrbio'.",
+      "Existe conflito de autores ao debaterem a nomenclatura adequada.",
+      "O termo 'dificuldade' foi banido da literatura médica.",
+      "Todos os transtornos agora são chamados de 'problemas sociais'."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 57,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "A aprendizagem decorre da:",
+    options: ["Memorização passiva de regras.", "Herança genética inalterável.", "Superação de dificuldades que a pessoa enfrenta em seu cotidiano.", "Ausência total de obstáculos no ambiente escolar."],
+    correctAnswer: 2
+  },
+  {
+    id: 58,
+    moduleId: 'disorders',
+    block: "Conceitos e Terminologias",
+    text: "Quando a criança enfrenta o conhecimento científico escolar, ela:",
+    options: [
+      "O assimila naturalmente sem precisar de orientação.",
+      "Necessita de orientações para superar as dificuldades iniciais.",
+      "Rejeita o conhecimento por ser alheio ao seu instinto.",
+      "Demonstra imediatamente transtornos psiquiátricos."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 59,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "Atribuir a dificuldade do aluno à 'preguiça' ou 'falta de esforço' é:",
+    options: ["Um diagnóstico preciso.", "A atitude correta para estimular o aluno.", "Uma forma errônea e equivocada de eximir a escola da responsabilidade.", "Uma avaliação neuropsicológica padrão."],
+    correctAnswer: 2
+  },
+  {
+    id: 60,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "A ideia de que alguns alunos nascem 'destinados' a ter sucesso escolar enquanto outros não é considerada:",
+    options: [
+      "Falsa, pois o problema é social e envolve o acesso a oportunidades.",
+      "Verdadeira, com base em testes de QI.",
+      "Verdadeira, segundo a determinação genética estrita.",
+      "Parcialmente correta apenas para matemática."
+    ],
+    correctAnswer: 0
+  },
+  {
+    id: 61,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "Segundo Tomaselli (2018), a aprendizagem tem como fatores base:",
+    options: ["Apenas a vontade do aluno.", "A genética e o ambiente sociocultural.", "Exclusivamente a alimentação.", "Somente as metodologias do professor."],
+    correctAnswer: 1
+  },
+  {
+    id: 62,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "A genética, em relação às capacidades cognitivas e de aprendizagem:",
+    options: ["É o determinante absoluto.", "Não exerce nenhuma influência.", "Gera influências, mas não é o determinante absoluto.", "Determina apenas a capacidade de leitura."],
+    correctAnswer: 2
+  },
+  {
+    id: 63,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "Qual conceito neurobiológico é decisivo para que pessoas com estruturas genéticas diferentes desenvolvam habilidades cognitivas?",
+    options: ["Rigidificação cerebral.", "Determinismo biológico.", "Plasticidade cerebral.", "Apoptose programada."],
+    correctAnswer: 2
+  },
+  {
+    id: 64,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "O ambiente sociocultural pode desempenhar qual papel nas dificuldades de aprendizagem?",
+    options: ["Ele é neutro.", "Pode atuar tanto na superação quanto na produção de dificuldades.", "Atua apenas na produção de transtornos genéticos.", "Resolve as dificuldades independentemente da escola."],
+    correctAnswer: 1
+  },
+  {
+    id: 65,
+    moduleId: 'disorders',
+    block: "Genética e Ambiente Sociocultural",
+    text: "Locais com pouco acesso a boas condições de vida e recursos limitados geram:",
+    options: [
+      "Aceleração do amadurecimento cognitivo.",
+      "Nenhuma diferença no aprendizado.",
+      "Maiores dificuldades na aprendizagem e no desenvolvimento de habilidades.",
+      "Imunidade a transtornos de aprendizagem."
+    ],
+    correctAnswer: 2
+  },
+  {
+    id: 66,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "A estrutura neurológica do indivíduo é afetada diretamente:",
+    options: [
+      "Apenas por fatores genéticos herdados.",
+      "Pela interação constante do indivíduo com o conhecimento e o meio social.",
+      "Exclusivamente por lesões traumáticas.",
+      "Apenas no período pré-natal."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 67,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "A plasticidade neural depende fundamentalmente de:",
+    options: ["Ser um processo estático.", "Isolamento social para focar no cérebro.", "Um processo dinâmico de adaptação e interação constante.", "Medicamentos estimulantes."],
+    correctAnswer: 2
+  },
+  {
+    id: 68,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "O Sistema Nervoso Central atua na busca de:",
+    options: ["Equilíbrio entre o organismo e o ambiente (interno e externo).", "Supressão total de estímulos externos.", "Isolamento de memórias passadas.", "Dominância de instintos primitivos."],
+    correctAnswer: 0
+  },
+  {
+    id: 69,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "Segundo Machado (2006), para que ocorra uma resposta consistente aos problemas, o SNC:",
+    options: ["Ignora o ambiente interno.", "Reconhece apenas o ambiente externo.", "Reconhece o ambiente externo e o ambiente interno.", "Age de forma puramente aleatória."],
+    correctAnswer: 2
+  },
+  {
+    id: 70,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "A organização das diferentes áreas do cérebro no período pós-natal ocorre de modo:",
+    options: ["Compartimentalizado e isolado.", "Em ondas correspondentes a diferentes faixas etárias.", "Imediato no primeiro mês de vida e depois cessa.", "Totalmente aleatório."],
+    correctAnswer: 1
+  },
+  {
+    id: 71,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "A qualidade do vínculo da criança com o ambiente reflete-se em seu:",
+    options: ["Nível de desenvolvimento cognitivo e neurológico.", "Grau de herança genética.", "Tipo sanguíneo.", "Nível de determinismo biológico."],
+    correctAnswer: 0
+  },
+  {
+    id: 72,
+    moduleId: 'disorders',
+    block: "Sistema Nervoso Central (SNC)",
+    text: "A falta de estimulação regular no ambiente da criança pode causar:",
+    options: [
+      "Aceleração da aprendizagem por compensação.",
+      "Limites em relação à sua formação social e acadêmica.",
+      "Melhora espontânea na cognição.",
+      "Hipertrofia do córtex cerebral."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 73,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Déficits cognitivos e linguísticos ligados especificamente a problemas na pronúncia e na articulação de fonemas caracterizam a:",
+    options: ["Dislexia.", "Disgrafia.", "Dislalia.", "Discalculia."],
+    correctAnswer: 2
+  },
+  {
+    id: 74,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "A dislexia caracteriza-se principalmente por:",
+    options: ["Letra ilegível.", "Mau domínio da leitura e de sua compreensão.", "Hiperatividade constante.", "Problemas exclusivos na abstração matemática."],
+    correctAnswer: 1
+  },
+  {
+    id: 75,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "A escrita ilegível e lenta, com margens irregulares e preensão inadequada do lápis, define a:",
+    options: ["Disgrafia.", "Disortografia.", "Dislalia.", "Discalculia."],
+    correctAnswer: 0
+  },
+  {
+    id: 76,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "A dificuldade em transcrever o estímulo sonoro para o símbolo gráfico (erros de ortografia sistemáticos) é chamada de:",
+    options: ["Dislalia.", "Disgrafia motora.", "Disortografia.", "TDAH."],
+    correctAnswer: 2
+  },
+  {
+    id: 77,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "O transtorno que afeta a capacidade de operar cálculos e compreender a abstração do número é a:",
+    options: ["Discalculia.", "Disortografia.", "Dislexia.", "Dislalia."],
+    correctAnswer: 0
+  },
+  {
+    id: 78,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "O Transtorno do Déficit de Atenção e Hiperatividade (TDAH) possui características comportamentais que incluem:",
+    options: ["Apenas desatenção, sem impulsividade.", "Hiperatividade, impulsividade e/ou desatenção.", "Deficiência intelectual severa.", "Isolamento social e perda da fala."],
+    correctAnswer: 1
+  },
+  {
+    id: 79,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Na dislalia, a criança não consegue estabelecer:",
+    options: [
+      "A coordenação dos movimentos de expressão da fala.",
+      "A coordenação motora para chutar uma bola.",
+      "A abstração dos números.",
+      "A leitura silenciosa."
+    ],
+    correctAnswer: 0
+  },
+  {
+    id: 80,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Disgrafia está diretamente associada a dificuldades em:",
+    options: [
+      "Coordenação motora ampla e fina, e organização espaço-temporal.",
+      "Discriminação auditiva de fonemas.",
+      "Atenção sustentada durante aulas teóricas.",
+      "Cálculos mentais de subtração."
+    ],
+    correctAnswer: 0
+  },
+  {
+    id: 81,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "A dislexia ocorre mesmo quando a criança:",
+    options: [
+      "Tem déficit intelectual grave.",
+      "Apresenta surdez congênita.",
+      "Possui um ambiente adequado para o processo de aprendizagem.",
+      "Não frequenta a escola."
+    ],
+    correctAnswer: 2
+  },
+  {
+    id: 82,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Erros frequentes na substituição de fonemas surdos por sonoros na escrita referem-se mais propriamente a um quadro de:",
+    options: ["Discalculia.", "Disortografia.", "TDAH.", "Disgrafia."],
+    correctAnswer: 1
+  },
+  {
+    id: 83,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Qual é a natureza do TDAH, segundo Barkley (2020)?",
+    options: ["É um hábito social adquirido.", "É um distúrbio neuropsiquiátrico crônico.", "É uma fase passageira do desenvolvimento infantil.", "É uma doença exclusivamente metabólica."],
+    correctAnswer: 1
+  },
+  {
+    id: 84,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "A força excessiva exercida sobre a folha ao escrever pode ser um indicativo de:",
+    options: ["TDAH.", "Dislalia.", "Disgrafia.", "Dislexia."],
+    correctAnswer: 2
+  },
+  {
+    id: 85,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "A confusão entre letras visualmente ou acusticamente semelhantes durante a escrita é um sintoma claro de:",
+    options: ["Disortografia.", "Hiperatividade.", "Discalculia.", "Mutismo."],
+    correctAnswer: 0
+  },
+  {
+    id: 86,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Um aluno que não consegue associar a quantidade ao numeral escrito possivelmente apresenta sinais de:",
+    options: ["Dislexia.", "Discalculia.", "Disgrafia.", "Disortografia."],
+    correctAnswer: 1
+  },
+  {
+    id: 87,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Todos os déficits linguísticos e cognitivos mencionados interferem em:",
+    options: [
+      "Traços genéticos herdados.",
+      "Correlações de fala, leitura, escrita ou atenção no ambiente escolar.",
+      "Apenas na vida profissional futura, sem impacto na infância.",
+      "Crescimento físico da criança."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 88,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "Para um diagnóstico preciso de transtornos de aprendizagem, é necessário:",
+    options: ["Avaliação exclusiva do professor.", "Avaliação multidisciplinar.", "Apenas um teste de visão.", "Apenas o relato dos pais."],
+    correctAnswer: 1
+  },
+  {
+    id: 89,
+    moduleId: 'disorders',
+    block: "Transtornos Específicos",
+    text: "TDAH com predominância desatenta significa que a criança:",
+    options: [
+      "É altamente agitada fisicamente.",
+      "Tem dificuldades sobretudo em manter o foco e a atenção.",
+      "Possui agressividade exacerbada.",
+      "Tem dislalia simultânea obrigatória."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 90,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Papéis fundamentais para o entendimento e apoio à criança com transtornos de aprendizagem cabem a:",
+    options: ["Apenas à família.", "Apenas à equipe médica.", "À família e à escola em conjunto.", "Ao governo exclusivamente."],
+    correctAnswer: 2
+  },
+  {
+    id: 91,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Os pais devem auxiliar seus filhos atuando como:",
+    options: [
+      "Juízes severos de seu desempenho.",
+      "Um porto seguro, com carinho e autoridade.",
+      "Substitutos dos professores na alfabetização.",
+      "Espectadores passivos."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 92,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Uma ação fundamental da escola frente aos transtornos é:",
+    options: [
+      "Utilizar os diagnósticos para segregar os alunos.",
+      "Evitar a estigmatização da criança.",
+      "Exigir que a criança resolva seus problemas sozinha.",
+      "Reprovar sistematicamente até a correção do déficit."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 93,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "As nomenclaturas diagnósticas devem ser utilizadas pela escola com orientação:",
+    options: ["Punitiva.", "Didática e equilibrada.", "Excludente.", "Médica-medicamentosa exclusiva."],
+    correctAnswer: 1
+  },
+  {
+    id: 94,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "O que acontece com qualquer pessoa ao envolver-se com conteúdos que não domina?",
+    options: [
+      "Aprende imediatamente se for inteligente.",
+      "Enfrenta dificuldades normais em sua compreensão.",
+      "Desenvolve um transtorno de aprendizagem.",
+      "Perde a plasticidade neural."
+    ],
+    correctAnswer: 1
+  },
+  {
+    id: 95,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Com paciência, boa vontade e persistência de quem ensina, o indivíduo:",
+    options: [
+      "Consegue apreender o que não sabe.",
+      "Torna-se dependente do professor.",
+      "Muda sua estrutura genética.",
+      "Cura-se de lesões cerebrais severas irreversíveis."
+    ],
+    correctAnswer: 0
+  },
+  {
+    id: 96,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Segundo a pesquisa de Bos e Vaughn (2019), qual a porcentagem de crianças consideradas 'normais' para o processo de ensino-aprendizagem (sem dificuldades ou transtornos relatados)?",
+    options: ["75%.", "50%.", "25%.", "5%."],
+    correctAnswer: 2
+  },
+  {
+    id: 97,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Na mesma pesquisa (Bos e Vaughn), o grupo que enfrenta dificuldades ou transtornos representa:",
+    options: ["10%.", "25%.", "50%.", "75%."],
+    correctAnswer: 3
+  },
+  {
+    id: 98,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "A relação ensino-aprendizagem, sob a ótica da superação, deve ser percebida pelo professor como:",
+    options: ["Um processo de mera transmissão.", "Um processo transformador.", "Uma avaliação classificatória.", "Um filtro de aptidões naturais."],
+    correctAnswer: 1
+  },
+  {
+    id: 99,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Estigmatizar a criança com dificuldades resulta em:",
+    options: [
+      "Aceleração da sua aprendizagem pelo desafio.",
+      "Aumento da autoestima intelectual.",
+      "Prejuízo no domínio conceitual que ela poderia vir a ter.",
+      "Facilitação do trabalho em grupo."
+    ],
+    correctAnswer: 2
+  },
+  {
+    id: 100,
+    moduleId: 'disorders',
+    block: "Orientações Escola/Família",
+    text: "Orientar as ações básicas para a plena interação da criança com a realidade exige:",
+    options: [
+      "Trabalho exclusivo do psicopedagogo.",
+      "Trabalho conjunto de profissionais, família e escola.",
+      "Que a escola abdique de seu papel científico.",
+      "Que os pais ignorem as orientações clínicas."
     ],
     correctAnswer: 1
   }

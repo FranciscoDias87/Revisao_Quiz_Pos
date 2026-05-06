@@ -68,18 +68,19 @@ export default function App() {
           const userDocRef = doc(db, 'users', currentUser.uid);
           const userSnap = await getDoc(userDocRef);
           
+          const currentUserEmail = currentUser.email?.toLowerCase();
           const isAdminEmail = 
-            currentUser.email === 'chicodias15@gmail.com' || 
-            currentUser.email === 'admin@edureview.com';
+            currentUserEmail === 'chicodias15@gmail.com' || 
+            currentUserEmail === 'admin@edureview.com';
             
           let role = isAdminEmail ? 'admin' : 'student';
-          console.log("Detected Role based on email:", role);
+          console.log("Detected Role based on email:", role, "for", currentUserEmail);
 
           if (!userSnap.exists()) {
             console.log("Creating new user profile...");
             await setDoc(userDocRef, {
               email: currentUser.email,
-              displayName: currentUser.displayName,
+              displayName: currentUser.displayName || 'Admin',
               photoURL: currentUser.photoURL,
               role: role,
               lastLogin: serverTimestamp(),
@@ -88,16 +89,21 @@ export default function App() {
             setUserProfile({ role });
           } else {
             const data = userSnap.data();
+            // Force admin role if email matches, even if DB says otherwise
             const activeRole = isAdminEmail ? 'admin' : (data.role || 'student');
             console.log("Active Role for session:", activeRole);
             
             setUserProfile({ role: activeRole });
             
-            // Sync with DB if role was forced to admin or if just updating lastLogin
-            await setDoc(userDocRef, {
-              lastLogin: serverTimestamp(),
-              role: activeRole
-            }, { merge: true });
+            // Sync with DB
+            try {
+              await setDoc(userDocRef, {
+                lastLogin: serverTimestamp(),
+                role: activeRole
+              }, { merge: true });
+            } catch (syncErr) {
+              console.warn("Non-blocking sync error:", syncErr);
+            }
           }
         } catch (error) {
           console.error("Error syncing profile:", error);

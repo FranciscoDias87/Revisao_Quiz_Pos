@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen, 
@@ -11,12 +11,24 @@ import {
   Trophy,
   ChevronLeft,
   ChevronRight,
-  Info
+  Info,
+  LogOut,
+  User as UserIcon,
+  Loader2,
+  TrendingUp,
+  BrainCircuit
 } from 'lucide-react';
-import { reviewTopics } from './data/content';
-import { quizQuestions } from './data/questions';
+import { reviewTopics as staticTopics } from './data/content';
+import { quizQuestions as staticQuestions } from './data/questions';
+import { auth, db } from './lib/firebase';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { doc, setDoc, getDoc, getDocs, collection, query, where, orderBy, serverTimestamp, addDoc } from 'firebase/firestore';
+import { Login } from './components/Login';
+import { AdminDashboard } from './components/AdminDashboard';
+import { ContentManager } from './components/ContentManager';
 
-type View = 'home' | 'review' | 'quiz' | 'results';
+type View = 'home' | 'review' | 'quiz' | 'results' | 'admin';
+type AdminTab = 'progress' | 'content';
 type ModuleId = 'eval' | 'disorders';
 
 const MODULES: Record<ModuleId, { title: string; desc: string; icon: string }> = {
@@ -33,26 +45,126 @@ const MODULES: Record<ModuleId, { title: string; desc: string; icon: string }> =
 };
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<{ role: string } | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [view, setView] = useState<View>('home');
+  const [adminTab, setAdminTab] = useState<AdminTab>('progress');
   const [selectedModule, setSelectedModule] = useState<ModuleId | null>(null);
   const [currentTopicIndex, setCurrentTopicIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [answers, setAnswers] = useState<Record<number, number | string>>({});
+  
+  const [dbTopics, setDbTopics] = useState<any[]>([]);
+  const [dbQuestions, setDbQuestions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      
+      if (currentUser) {
+        try {
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userDocRef);
+          
+          let role = 'student';
+          if (currentUser.email === 'chicodias15@gmail.com') {
+            role = 'admin';
+          }
+
+          if (!userSnap.exists()) {
+            await setDoc(userDocRef, {
+              email: currentUser.email,
+              displayName: currentUser.displayName,
+              photoURL: currentUser.photoURL,
+              role: role,
+              lastLogin: serverTimestamp(),
+              createdAt: serverTimestamp()
+            });
+            setUserProfile({ role });
+          } else {
+            const data = userSnap.data();
+            setUserProfile({ role: data.role || role });
+            await setDoc(userDocRef, {
+              lastLogin: serverTimestamp()
+            }, { merge: true });
+          }
+        } catch (error) {
+          console.error("Error syncing profile:", error);
+        }
+      } else {
+        setUserProfile(null);
+      }
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Fetch Firestore Content
+  useEffect(() => {
+    if (user && selectedModule) {
+      const fetchContent = async () => {
+        try {
+          const topicsRef = collection(db, 'topics');
+          const topicsSnap = await getDocs(query(topicsRef, where('moduleId', '==', selectedModule), orderBy('order', 'asc')));
+          const questionsRef = collection(db, 'questions');
+          const questionsSnap = await getDocs(query(questionsRef, where('moduleId', '==', selectedModule)));
+
+          setDbTopics(topicsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+          setDbQuestions(questionsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        } catch (error) {
+          console.error("Error fetching content:", error);
+        }
+      };
+      fetchContent();
+    }
+  }, [user, selectedModule]);
 
   const filteredTopics = useMemo(() => {
-    return reviewTopics.filter(t => t.moduleId === selectedModule);
-  }, [selectedModule]);
+    const firestoreItems = dbTopics.filter(t => t.moduleId === selectedModule);
+    const staticItems = staticTopics.filter(t => t.moduleId === selectedModule);
+    return [...staticItems, ...firestoreItems].sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [selectedModule, dbTopics]);
 
   const filteredQuestions = useMemo(() => {
-    return quizQuestions.filter(q => q.moduleId === selectedModule);
-  }, [selectedModule]);
+    const firestoreItems = dbQuestions.filter(q => q.moduleId === selectedModule);
+    const staticItems = staticQuestions.filter(q => q.moduleId === selectedModule);
+    return [...staticItems, ...firestoreItems];
+  }, [selectedModule, dbQuestions]);
 
   const score = useMemo(() => {
     return Object.entries(answers).reduce((acc, [qId, answerIndex]) => {
-      const question = filteredQuestions.find(q => q.id === parseInt(qId));
+      const question = filteredQuestions.find(q => q.id === qId || q.id === Number(qId));
       return question && question.correctAnswer === answerIndex ? acc + 1 : acc;
     }, 0);
   }, [answers, filteredQuestions]);
+
+  const saveAttempt = async () => {
+    if (!user || !selectedModule) return;
+    try {
+      await addDoc(collection(db, 'attempts'), {
+        userId: user.uid,
+        userEmail: user.email,
+        displayName: user.displayName || user.email?.split('@')[0],
+        moduleId: selectedModule,
+        score,
+        total: filteredQuestions.length,
+        timestamp: serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error saving attempt:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setView('home');
+      setSelectedModule(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   const startReview = (moduleId: ModuleId) => {
     setSelectedModule(moduleId);
@@ -67,11 +179,16 @@ export default function App() {
     setView('quiz');
   };
 
-  const handleAnswer = (questionId: number, optionIndex: number) => {
+  const finalizeQuiz = () => {
+    setView('results');
+    saveAttempt();
+  };
+
+  const handleAnswer = (questionId: number | string, optionIndex: number) => {
     setAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
   };
 
-  const getQuestionStatus = (questionId: number) => {
+  const getQuestionStatus = (questionId: number | string) => {
     if (answers[questionId] === undefined) return 'unanswered';
     const question = filteredQuestions.find(q => q.id === questionId);
     if (!question) return 'unanswered';
@@ -84,42 +201,139 @@ export default function App() {
     setView('quiz');
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="animate-spin text-indigo-600 mx-auto mb-4" size={40} />
+          <p className="text-slate-500 font-medium">Carregando EduReview...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login onSuccess={() => {}} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Header */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
-        <div 
-          className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
-          onClick={() => { setView('home'); setSelectedModule(null); }}
-        >
-          <div className="bg-indigo-600 p-1 rounded-lg text-white group-hover:scale-110 transition-transform sm:p-1.5">
-            <GraduationCap size={18} className="sm:w-[20px] sm:h-[20px]" />
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-sm">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div 
+            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
+            onClick={() => { setView('home'); setSelectedModule(null); }}
+          >
+            <div className="bg-indigo-600 p-1 rounded-lg text-white group-hover:scale-110 transition-transform sm:p-1.5">
+              <GraduationCap size={18} className="sm:w-[20px] sm:h-[20px]" />
+            </div>
+            <span className="font-bold text-base sm:text-lg tracking-tight">EduReview</span>
           </div>
-          <span className="font-bold text-base sm:text-lg tracking-tight">EduReview</span>
+          
+          <div className="flex items-center gap-4">
+            {userProfile?.role === 'admin' && view !== 'admin' && (
+              <button 
+                onClick={() => setView('admin')}
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-100 hover:bg-amber-100 transition-all"
+              >
+                <Trophy size={14} /> Painel Admin
+              </button>
+            )}
+
+            {selectedModule && view !== 'admin' && (
+              <div className="hidden md:flex gap-3 sm:gap-4 border-r border-slate-200 pr-4 mr-2">
+                <button 
+                  onClick={() => setView('review')}
+                  className={`flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium transition-colors ${view === 'review' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
+                >
+                  <BookOpen size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span>Revisão</span>
+                </button>
+                <button 
+                  onClick={() => setView('quiz')}
+                  className={`flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium transition-colors ${view === 'quiz' || view === 'results' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
+                >
+                  <Layout size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span>Simulado</span>
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden xs:flex flex-col items-end mr-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  {userProfile?.role === 'admin' ? 'Administrador' : 'Estudante'}
+                </span>
+                <span className="text-sm font-bold text-slate-700 truncate max-w-[120px]">
+                  {user.displayName || user.email?.split('@')[0]}
+                </span>
+              </div>
+              
+              {user.photoURL ? (
+                <div className="relative">
+                  <img src={user.photoURL} alt="User" className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 ${userProfile?.role === 'admin' ? 'border-amber-400' : 'border-slate-100'}`} referrerPolicy="no-referrer" />
+                  {userProfile?.role === 'admin' && (
+                    <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-0.5 rounded-full border border-white">
+                      <Trophy size={10} />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 ${userProfile?.role === 'admin' ? 'bg-amber-100 text-amber-600 border-amber-200' : 'bg-indigo-100 text-indigo-600 border-indigo-50'}`}>
+                  {userProfile?.role === 'admin' ? <Trophy size={20} /> : <UserIcon size={20} />}
+                </div>
+              )}
+
+              <button 
+                onClick={handleLogout}
+                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                title="Sair"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          </div>
         </div>
-        
-        {selectedModule && (
-          <div className="flex gap-3 sm:gap-4">
-            <button 
-              onClick={() => setView('review')}
-              className={`flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium transition-colors ${view === 'review' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
-            >
-              <BookOpen size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="hidden xs:inline">Revisão</span>
-            </button>
-            <button 
-              onClick={() => setView('quiz')}
-              className={`flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm font-medium transition-colors ${view === 'quiz' || view === 'results' ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
-            >
-              <Layout size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="hidden xs:inline">Simulado</span>
-            </button>
-          </div>
-        )}
       </nav>
 
-      <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
         <AnimatePresence mode="wait">
+          {view === 'admin' && userProfile?.role === 'admin' && (
+            <motion.div
+              key="admin"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-8"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                <div>
+                  <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+                    <Trophy className="text-amber-500" /> Painel de Administração
+                  </h1>
+                  <p className="text-slate-500 text-sm">Gestão de progresso e conteúdo automatizado</p>
+                </div>
+                <div className="flex gap-2 p-1 bg-slate-100 rounded-xl self-start sm:self-center">
+                  <button 
+                    onClick={() => setAdminTab('progress')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${adminTab === 'progress' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    <TrendingUp size={16} /> Alunos
+                  </button>
+                  <button 
+                    onClick={() => setAdminTab('content')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${adminTab === 'content' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                  >
+                    <BrainCircuit size={16} /> Conteúdo IA
+                  </button>
+                </div>
+              </div>
+
+              {adminTab === 'progress' ? <AdminDashboard /> : <ContentManager />}
+            </motion.div>
+          )}
+
           {/* HOME VIEW */}
           {view === 'home' && (
             <motion.div 
@@ -336,16 +550,40 @@ export default function App() {
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl"
+                    className={`mt-8 p-6 border-2 rounded-2xl ${
+                      answers[filteredQuestions[currentQuestionIndex].id] === filteredQuestions[currentQuestionIndex].correctAnswer 
+                        ? 'bg-emerald-50 border-emerald-100' 
+                        : 'bg-rose-50 border-rose-100'
+                    }`}
                   >
-                    <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                      <Info size={18} className="text-indigo-600" />
-                      Explicação:
-                    </h4>
-                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                      {filteredQuestions[currentQuestionIndex].explanation || 
-                       `A alternativa correta é a "${String.fromCharCode(65 + filteredQuestions[currentQuestionIndex].correctAnswer)}". Esta questão aborda conceitos de ${filteredQuestions[currentQuestionIndex].block}.`}
-                    </p>
+                    <div className="flex items-center gap-2 mb-3">
+                      {answers[filteredQuestions[currentQuestionIndex].id] === filteredQuestions[currentQuestionIndex].correctAnswer ? (
+                        <div className="flex items-center gap-2 text-emerald-700 font-bold">
+                          <CheckCircle2 size={20} />
+                          <span>Resposta Correta!</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-rose-700 font-bold">
+                          <Info size={20} />
+                          <span>Não foi dessa vez.</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <p className="text-slate-700 text-sm sm:text-base leading-relaxed">
+                        {answers[filteredQuestions[currentQuestionIndex].id] === filteredQuestions[currentQuestionIndex].correctAnswer 
+                          ? `Parabéns! Você identificou corretamente que a alternativa "${String.fromCharCode(65 + filteredQuestions[currentQuestionIndex].correctAnswer)}" é a resposta certa.`
+                          : `Você marcou a alternativa "${String.fromCharCode(65 + (answers[filteredQuestions[currentQuestionIndex].id] ?? 0))}", mas a correta é a "${String.fromCharCode(65 + filteredQuestions[currentQuestionIndex].correctAnswer)}".`}
+                      </p>
+                      <div className="p-4 bg-white/50 rounded-xl border border-white">
+                        <p className="text-slate-600 text-sm leading-relaxed italic">
+                          <span className="font-bold text-slate-800 not-italic block mb-1">Por que esta é a correta?</span>
+                          {filteredQuestions[currentQuestionIndex].explanation || 
+                           `Esta questão de ${filteredQuestions[currentQuestionIndex].block} exige a compreensão dos marcos regulatórios e teóricos apresentados nos textos base. Releia o tópico de revisão correspondente para consolidar este ponto.`}
+                        </p>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </div>
@@ -371,7 +609,7 @@ export default function App() {
 
                 {Object.keys(answers).length === filteredQuestions.length && (
                   <button 
-                    onClick={() => setView('results')}
+                    onClick={finalizeQuiz}
                     className="w-full sm:w-auto px-10 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all transform hover:scale-105"
                   >
                     Finalizar Simulado

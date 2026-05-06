@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == "chicodias15@gmail.com"
+      );
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'createdAt', 'role', 'lastLogin']) &&
+             data.email is string &&
+             data.role in ['admin', 'student'] &&
+             data.createdAt == request.time &&
+             data.lastLogin == request.time;
+    }
+
+    function isValidTopic(data) {
+      return data.keys().hasAll(['moduleId', 'title', 'content', 'order', 'createdAt']) &&
+             data.moduleId is string &&
+             data.title is string &&
+             data.content is string &&
+             data.createdAt == request.time;
+    }
+
+    function isValidQuestion(data) {
+      return data.keys().hasAll(['moduleId', 'text', 'options', 'correctAnswer', 'block', 'explanation', 'createdAt']) &&
+             data.moduleId is string &&
+             data.text is string &&
+             data.options is list &&
+             data.correctAnswer is int &&
+             data.createdAt == request.time;
+    }
+
+    function isValidAttempt(data) {
+      return data.keys().hasAll(['userId', 'moduleId', 'score', 'total', 'timestamp', 'userEmail', 'displayName']) &&
+             data.userId == request.auth.uid &&
+             data.moduleId is string &&
+             data.score is int &&
+             data.total is int &&
+             data.userEmail is string &&
+             data.timestamp == request.time;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == "student";
+      allow update: if isOwner(userId) && 
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoURL', 'lastLogin']) &&
+                      (request.resource.data.lastLogin == request.time || request.resource.data.lastLogin == resource.data.lastLogin);
+    }
+
+    // Admin list for exists check
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+    }
+
+    // Study Topics
+    match /topics/{topicId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() && isValidTopic(request.resource.data);
+    }
+
+    // Questions
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() && isValidQuestion(request.resource.data);
+    }
+
+    // Quiz Attempts
+    match /attempts/{attemptId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow list: if isAdmin() || (isSignedIn() && request.query.limit <= 100); // Pagination for students
+      allow create: if isSignedIn() && isValidAttempt(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+  }
+}

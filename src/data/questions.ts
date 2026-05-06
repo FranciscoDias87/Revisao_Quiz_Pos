@@ -41,7 +41,8 @@ export const quizQuestions: Question[] = [
       "Avaliações exclusivamente emancipatórias.",
       "Políticas educacionais desvinculadas de herança histórica."
     ],
-    correctAnswer: 0
+    correctAnswer: 0,
+    explanation: "A aristocracia e a escravidão moldaram uma sociedade onde o poder e o conhecimento eram privilégios. Isso se reflete hoje no patrimonialismo (confusão entre público e privado) e no patriarcalismo (autoridade centralizada)."
   },
   {
     id: 4,
@@ -54,7 +55,8 @@ export const quizQuestions: Question[] = [
       "Um modelo de educação integral e popular imposto pelas elites.",
       "Um histórico pautado na reprodução de desigualdades de uma cultura colonial."
     ],
-    correctAnswer: 3
+    correctAnswer: 3,
+    explanation: "A educação no Brasil não foi neutra; ela foi uma ferramenta das elites para manter disparidades sociais. O sistema avaliativo muitas vezes funcionou como um filtro excludente e não como um apoio ao aprendizado."
   },
   {
     id: 5,
@@ -67,7 +69,8 @@ export const quizQuestions: Question[] = [
       "Fomentar o potencial criativo e crítico do ser educador no presente.",
       "Justificar a reprovação dos estudantes em larga escala."
     ],
-    correctAnswer: 2
+    correctAnswer: 2,
+    explanation: "Conhecer a história nos permite identificar vícios do passado e transformar as práticas atuais, promovendo uma educação mais reflexiva e voltada para a emancipação do aluno."
   },
   {
     id: 6,

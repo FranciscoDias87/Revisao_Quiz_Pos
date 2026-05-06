@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "photoURL": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "student"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastLogin": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "createdAt", "role"]
+    },
+    "Topic": {
+      "title": "Study Topic",
+      "description": "Educational content for review.",
+      "type": "object",
+      "properties": {
+        "moduleId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["moduleId", "title", "content"]
+    },
+    "Question": {
+      "title": "Quiz Question",
+      "description": "Assessment question.",
+      "type": "object",
+      "properties": {
+        "moduleId": { "type": "string" },
+        "block": { "type": "string" },
+        "text": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctAnswer": { "type": "number" },
+        "explanation": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["moduleId", "text", "options", "correctAnswer"]
+    },
+    "QuizAttempt": {
+      "title": "Quiz Attempt",
+      "description": "Recording of a student taking a quiz.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "displayName": { "type": "string" },
+        "moduleId": { "type": "string" },
+        "score": { "type": "number" },
+        "total": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "moduleId", "score", "total", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles."
+    },
+    "/topics/{topicId}": {
+      "schema": "Topic",
+      "description": "Review content topics."
+    },
+    "/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Quiz questions bank."
+    },
+    "/attempts/{attemptId}": {
+      "schema": "QuizAttempt",
+      "description": "Quiz performance records."
+    }
+  }
+}

@@ -9,16 +9,27 @@ import {
   Loader2, 
   Trash2,
   Save,
-  Plus
+  Plus,
+  FolderPlus
 } from 'lucide-react';
 import * as pdfjs from 'pdfjs-dist';
 import { generateContentFromText, saveGeneratedContent, GeneratedTopic, GeneratedQuestion } from '../services/aiService';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export const ContentManager: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState('eval');
+  const [modules, setModules] = useState<{id: string, title: string}[]>([
+    { id: 'eval', title: 'Avaliação da Aprendizagem' },
+    { id: 'disorders', title: 'Distúrbios de Aprendizagem' }
+  ]);
+  const [isCreatingModule, setIsCreatingModule] = useState(false);
+  const [newModuleTitle, setNewModuleTitle] = useState('');
+  const [newModuleDesc, setNewModuleDesc] = useState('');
+
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<'idle' | 'parsing' | 'generating' | 'reviewing' | 'saving' | 'success'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +39,53 @@ export const ContentManager: React.FC = () => {
   const [generatedQuestions, setGeneratedQuestions] = useState<GeneratedQuestion[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'modules'));
+        const dynamicModules = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          title: doc.data().title
+        }));
+        setModules(prev => {
+          const staticIds = ['eval', 'disorders'];
+          // Avoid duplication if useEffect runs twice
+          const filteredDynamic = dynamicModules.filter(dm => !prev.some(p => p.id === dm.id));
+          return [...prev, ...filteredDynamic];
+        });
+      } catch (err) {
+        console.error("Error fetching modules:", err);
+      }
+    };
+    fetchModules();
+  }, []);
+
+  const handleCreateModule = async () => {
+    if (!newModuleTitle.trim() || !newModuleDesc.trim()) return;
+    
+    try {
+      setStatus('saving');
+      const docRef = await addDoc(collection(db, 'modules'), {
+        title: newModuleTitle.trim(),
+        desc: newModuleDesc.trim(),
+        icon: 'book',
+        createdAt: serverTimestamp()
+      });
+      
+      const newMod = { id: docRef.id, title: newModuleTitle.trim() };
+      setModules(prev => [...prev, newMod]);
+      setSelectedModule(docRef.id);
+      setIsCreatingModule(false);
+      setNewModuleTitle('');
+      setNewModuleDesc('');
+      setStatus('idle');
+    } catch (err) {
+      console.error("Error creating module:", err);
+      setError('Erro ao criar módulo.');
+      setStatus('idle');
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -99,10 +157,54 @@ export const ContentManager: React.FC = () => {
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-8">
-        <div className="flex items-center gap-3 text-indigo-600 mb-6">
-          <BrainCircuit size={32} />
-          <h2 className="text-2xl font-bold">Ingestão de Conteúdo (AI)</h2>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3 text-indigo-600">
+            <BrainCircuit size={32} />
+            <h2 className="text-2xl font-bold">Ingestão de Conteúdo (AI)</h2>
+          </div>
+          <button 
+            onClick={() => setIsCreatingModule(!isCreatingModule)}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all"
+          >
+            <FolderPlus size={18} /> {isCreatingModule ? 'Cancelar' : 'Novo Módulo'}
+          </button>
         </div>
+
+        <AnimatePresence>
+          {isCreatingModule && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-4"
+            >
+              <h3 className="font-bold text-slate-900">Criar Novo Módulo</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input 
+                  type="text" 
+                  placeholder="Título do Módulo"
+                  value={newModuleTitle}
+                  onChange={(e) => setNewModuleTitle(e.target.value)}
+                  className="p-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 font-medium"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Breve Descrição"
+                  value={newModuleDesc}
+                  onChange={(e) => setNewModuleDesc(e.target.value)}
+                  className="p-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 font-medium"
+                />
+              </div>
+              <button 
+                onClick={handleCreateModule}
+                disabled={!newModuleTitle.trim() || !newModuleDesc.trim() || status === 'saving'}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50"
+              >
+                {status === 'saving' ? 'Criando...' : 'Criar e Selecionar'}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Configuration */}
@@ -114,8 +216,9 @@ export const ContentManager: React.FC = () => {
                 onChange={(e) => setSelectedModule(e.target.value)}
                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-400 transition-all font-medium"
               >
-                <option value="eval">Avaliação da Aprendizagem</option>
-                <option value="disorders">Distúrbios de Aprendizagem</option>
+                {modules.map(mod => (
+                  <option key={mod.id} value={mod.id}>{mod.title}</option>
+                ))}
               </select>
             </div>
 

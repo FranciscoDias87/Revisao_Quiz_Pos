@@ -29,9 +29,9 @@ import { ContentManager } from './components/ContentManager';
 
 type View = 'home' | 'review' | 'quiz' | 'results' | 'admin';
 type AdminTab = 'progress' | 'content';
-type ModuleId = 'eval' | 'disorders';
+type ModuleId = string;
 
-const MODULES: Record<ModuleId, { title: string; desc: string; icon: string }> = {
+const STATIC_MODULES: Record<string, { title: string; desc: string; icon: string }> = {
   eval: {
     title: 'Paradigmas da Avaliação',
     desc: 'Avaliação, currículo e políticas educacionais brasileiras.',
@@ -55,8 +55,21 @@ export default function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number | string>>({});
   
+  const [dbModules, setDbModules] = useState<any[]>([]);
   const [dbTopics, setDbTopics] = useState<any[]>([]);
   const [dbQuestions, setDbQuestions] = useState<any[]>([]);
+
+  const allModules = useMemo(() => {
+    const dynamic: Record<string, any> = {};
+    dbModules.forEach(mod => {
+      dynamic[mod.id] = {
+        title: mod.title,
+        desc: mod.desc,
+        icon: mod.icon || 'book'
+      };
+    });
+    return { ...STATIC_MODULES, ...dynamic };
+  }, [dbModules]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -115,6 +128,21 @@ export default function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Fetch Dynamic Modules
+  useEffect(() => {
+    if (user) {
+      const fetchModules = async () => {
+        try {
+          const snap = await getDocs(collection(db, 'modules'));
+          setDbModules(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        } catch (err) {
+          console.error("Error fetching modules:", err);
+        }
+      };
+      fetchModules();
+    }
+  }, [user]);
 
   // Fetch Firestore Content
   useEffect(() => {
@@ -370,7 +398,7 @@ export default function App() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 w-full max-w-4xl px-2">
-                {(Object.entries(MODULES) as [ModuleId, typeof MODULES['eval']][]).map(([id, mod]) => (
+                {(Object.entries(allModules) as [string, { title: string; desc: string; icon: string }][]).map(([id, mod]) => (
                   <div key={id} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                     <div className={`p-5 sm:p-6 text-white ${id === 'eval' ? 'bg-indigo-600' : 'bg-violet-600'}`}>
                       <h3 className="text-lg sm:text-xl font-bold mb-1">{mod.title}</h3>
@@ -411,7 +439,7 @@ export default function App() {
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                     <BookOpen className="text-indigo-600" size={24} />
-                    {MODULES[selectedModule].title}
+                    {allModules[selectedModule]?.title}
                   </h2>
                   <p className="text-slate-500 text-sm">Tópico {currentTopicIndex + 1} de {filteredTopics.length}</p>
                 </div>
@@ -505,7 +533,7 @@ export default function App() {
               {/* Progress Bar */}
               <div className="mb-6">
                 <div className="flex justify-between items-end mb-2">
-                  <h2 className="text-xl font-bold text-slate-900">Simulado: {MODULES[selectedModule].title}</h2>
+                  <h2 className="text-xl font-bold text-slate-900">Simulado: {allModules[selectedModule]?.title}</h2>
                   <span className="text-slate-500 font-mono text-sm">
                     Questão {currentQuestionIndex + 1}/{filteredQuestions.length}
                   </span>
@@ -523,11 +551,11 @@ export default function App() {
               <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xl p-5 sm:p-10 mb-6">
                 <div className="flex items-center gap-2 text-indigo-600 mb-4 bg-indigo-50 w-fit px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider">
                   <Info size={12} className="sm:w-[14px] sm:h-[14px]" />
-                  {filteredQuestions[currentQuestionIndex].block}
+                  {filteredQuestions[currentQuestionIndex]?.block}
                 </div>
                 
                 <h3 className="text-lg sm:text-2xl font-bold text-slate-800 mb-6 sm:mb-8 leading-snug">
-                  {filteredQuestions[currentQuestionIndex].text}
+                  {filteredQuestions[currentQuestionIndex]?.text}
                 </h3>
 
                 <div className="space-y-2 sm:space-y-3">
@@ -661,7 +689,7 @@ export default function App() {
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Resultado Final</h2>
-              <p className="text-slate-500 mb-6 sm:mb-8 text-center px-4">Simulado: {MODULES[selectedModule].title}</p>
+              <p className="text-slate-500 mb-6 sm:mb-8 text-center px-4">Simulado: {allModules[selectedModule]?.title}</p>
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-sm mb-8 sm:mb-12 px-4">
                 <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 text-center shadow-sm">

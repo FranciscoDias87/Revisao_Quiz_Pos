@@ -60,6 +60,7 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      console.log("Auth State Changed:", currentUser?.email);
       setUser(currentUser);
       
       if (currentUser) {
@@ -67,12 +68,15 @@ export default function App() {
           const userDocRef = doc(db, 'users', currentUser.uid);
           const userSnap = await getDoc(userDocRef);
           
-          let role = 'student';
-          if (currentUser.email === 'chicodias15@gmail.com' || currentUser.email === 'admin@edureview.com') {
-            role = 'admin';
-          }
+          const isAdminEmail = 
+            currentUser.email === 'chicodias15@gmail.com' || 
+            currentUser.email === 'admin@edureview.com';
+            
+          let role = isAdminEmail ? 'admin' : 'student';
+          console.log("Detected Role based on email:", role);
 
           if (!userSnap.exists()) {
+            console.log("Creating new user profile...");
             await setDoc(userDocRef, {
               email: currentUser.email,
               displayName: currentUser.displayName,
@@ -84,13 +88,15 @@ export default function App() {
             setUserProfile({ role });
           } else {
             const data = userSnap.data();
-            // Force role update if email matches admin list but DB says student
-            const activeRole = (currentUser.email === 'chicodias15@gmail.com' || currentUser.email === 'admin@edureview.com') ? 'admin' : (data.role || role);
+            const activeRole = isAdminEmail ? 'admin' : (data.role || 'student');
+            console.log("Active Role for session:", activeRole);
             
             setUserProfile({ role: activeRole });
+            
+            // Sync with DB if role was forced to admin or if just updating lastLogin
             await setDoc(userDocRef, {
               lastLogin: serverTimestamp(),
-              role: activeRole // Sync if changed
+              role: activeRole
             }, { merge: true });
           }
         } catch (error) {

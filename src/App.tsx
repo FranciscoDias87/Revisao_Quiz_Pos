@@ -68,7 +68,7 @@ export default function App() {
           const userSnap = await getDoc(userDocRef);
           
           let role = 'student';
-          if (currentUser.email === 'chicodias15@gmail.com') {
+          if (currentUser.email === 'chicodias15@gmail.com' || currentUser.email === 'admin@edureview.com') {
             role = 'admin';
           }
 

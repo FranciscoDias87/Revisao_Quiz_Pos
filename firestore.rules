@@ -63,9 +63,11 @@ service cloud.firestore {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
       allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == "student";
-      allow update: if isOwner(userId) && 
-                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoURL', 'lastLogin']) &&
-                      (request.resource.data.lastLogin == request.time || request.resource.data.lastLogin == resource.data.lastLogin);
+      allow update: if isOwner(userId) && (
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoURL', 'lastLogin', 'role']) &&
+                      (request.resource.data.lastLogin == request.time || request.resource.data.lastLogin == resource.data.lastLogin) &&
+                      (request.resource.data.role == resource.data.role || isAdmin())
+                    );
     }
 
     // Admin list for exists check

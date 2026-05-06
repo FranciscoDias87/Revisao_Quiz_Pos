@@ -84,9 +84,13 @@ export default function App() {
             setUserProfile({ role });
           } else {
             const data = userSnap.data();
-            setUserProfile({ role: data.role || role });
+            // Force role update if email matches admin list but DB says student
+            const activeRole = (currentUser.email === 'chicodias15@gmail.com' || currentUser.email === 'admin@edureview.com') ? 'admin' : (data.role || role);
+            
+            setUserProfile({ role: activeRole });
             await setDoc(userDocRef, {
-              lastLogin: serverTimestamp()
+              lastLogin: serverTimestamp(),
+              role: activeRole // Sync if changed
             }, { merge: true });
           }
         } catch (error) {
@@ -235,9 +239,9 @@ export default function App() {
             {userProfile?.role === 'admin' && view !== 'admin' && (
               <button 
                 onClick={() => setView('admin')}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-100 hover:bg-amber-100 transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-100 hover:bg-amber-100 transition-all"
               >
-                <Trophy size={14} /> Painel Admin
+                <Trophy size={14} /> <span className="hidden xs:inline">Painel Admin</span>
               </button>
             )}
 

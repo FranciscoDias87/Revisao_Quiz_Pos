@@ -559,38 +559,59 @@ export default function App() {
                 </h3>
 
                 <div className="space-y-2 sm:space-y-3">
-                  {filteredQuestions[currentQuestionIndex].options.map((option, idx) => {
-                    const studentAnswer = answers[filteredQuestions[currentQuestionIndex].id];
-                    const isSelected = studentAnswer === idx;
-                    const isCorrect = idx === filteredQuestions[currentQuestionIndex].correctAnswer;
-                    const hasAnswered = studentAnswer !== undefined;
-                    
-                    let bgClass = "bg-slate-50 border-slate-200 hover:border-indigo-300 hover:bg-white";
-                    if (hasAnswered) {
-                      if (isCorrect) bgClass = "bg-emerald-50 border-emerald-500 text-emerald-900";
-                      else if (isSelected) bgClass = "bg-rose-50 border-rose-500 text-rose-900";
-                      else bgClass = "bg-slate-50 border-slate-200 opacity-50";
-                    }
+                  {filteredQuestions[currentQuestionIndex].type === 'subjective' ? (
+                    <div className="space-y-4">
+                      <div className="p-6 bg-slate-50 border-2 border-slate-200 rounded-2xl">
+                        <p className="text-slate-500 italic text-sm mb-4">Esta é uma questão subjetiva. Reflita sobre sua resposta e clique no botão abaixo para ver o padrão de resposta esperado.</p>
+                        {answers[filteredQuestions[currentQuestionIndex].id] === undefined ? (
+                          <button 
+                            onClick={() => handleAnswer(filteredQuestions[currentQuestionIndex].id, 0)}
+                            className="w-full py-3 bg-amber-100 text-amber-700 rounded-xl font-bold hover:bg-amber-200 transition-all border border-amber-200"
+                          >
+                            Ver Resposta Esperada
+                          </button>
+                        ) : (
+                          <div className="p-4 bg-white border border-indigo-100 rounded-xl">
+                            <span className="text-[10px] font-black text-indigo-600 uppercase block mb-2">Padrão de Resposta:</span>
+                            <p className="text-slate-700 text-sm">{filteredQuestions[currentQuestionIndex].explanation}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    filteredQuestions[currentQuestionIndex].options.map((option, idx) => {
+                      const studentAnswer = answers[filteredQuestions[currentQuestionIndex].id];
+                      const isSelected = studentAnswer === idx;
+                      const isCorrect = idx === filteredQuestions[currentQuestionIndex].correctAnswer;
+                      const hasAnswered = studentAnswer !== undefined;
+                      
+                      let bgClass = "bg-slate-50 border-slate-200 hover:border-indigo-300 hover:bg-white";
+                      if (hasAnswered) {
+                        if (isCorrect) bgClass = "bg-emerald-50 border-emerald-500 text-emerald-900";
+                        else if (isSelected) bgClass = "bg-rose-50 border-rose-500 text-rose-900";
+                        else bgClass = "bg-slate-50 border-slate-200 opacity-50";
+                      }
 
-                    return (
-                      <button
-                        key={idx}
-                        disabled={hasAnswered}
-                        onClick={() => handleAnswer(filteredQuestions[currentQuestionIndex].id, idx)}
-                        className={`w-full text-left p-3 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all flex items-start gap-3 sm:gap-4 ${bgClass}`}
-                      >
-                        <span className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs sm:text-sm ${isSelected ? 'border-current' : 'border-slate-300'}`}>
-                          {String.fromCharCode(65 + idx)}
-                        </span>
-                        <span className="text-sm sm:text-lg flex-grow py-0.5">{option}</span>
-                        {hasAnswered && isCorrect && <CheckCircle2 className="text-emerald-500 mt-1" size={20} />}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={idx}
+                          disabled={hasAnswered}
+                          onClick={() => handleAnswer(filteredQuestions[currentQuestionIndex].id, idx)}
+                          className={`w-full text-left p-3 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all flex items-start gap-3 sm:gap-4 ${bgClass}`}
+                        >
+                          <span className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 flex items-center justify-center font-bold text-xs sm:text-sm ${isSelected ? 'border-current' : 'border-slate-300'}`}>
+                            {String.fromCharCode(65 + idx)}
+                          </span>
+                          <span className="text-sm sm:text-lg flex-grow py-0.5">{option}</span>
+                          {hasAnswered && isCorrect && <CheckCircle2 className="text-emerald-500 mt-1" size={20} />}
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
 
                 {/* Explanation */}
-                {answers[filteredQuestions[currentQuestionIndex].id] !== undefined && (
+                {answers[filteredQuestions[currentQuestionIndex].id] !== undefined && filteredQuestions[currentQuestionIndex].type !== 'subjective' && (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

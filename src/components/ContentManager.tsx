@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   FileUp, 
@@ -10,15 +10,18 @@ import {
   Trash2,
   Save,
   Plus,
-  FolderPlus
+  FolderPlus,
+  X,
+  HelpCircle,
+  FileQuestion
 } from 'lucide-react';
 import * as pdfjs from 'pdfjs-dist';
 import { generateContentFromText, saveGeneratedContent, GeneratedTopic, GeneratedQuestion } from '../services/aiService';
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
-// Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Set up PDF.js worker using unpkg which is more reliable
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export const ContentManager: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState('eval');
@@ -84,6 +87,25 @@ export const ContentManager: React.FC = () => {
       console.error("Error creating module:", err);
       setError('Erro ao criar módulo.');
       setStatus('idle');
+    }
+  };
+
+  const handleDeleteModule = async (moduleId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (['eval', 'disorders'].includes(moduleId)) {
+      alert("Módulos padrão não podem ser removidos.");
+      return;
+    }
+
+    if (!confirm("Tem certeza que deseja remover este módulo?")) return;
+
+    try {
+      await deleteDoc(doc(db, 'modules', moduleId));
+      setModules(prev => prev.filter(m => m.id !== moduleId));
+      if (selectedModule === moduleId) setSelectedModule('eval');
+    } catch (err) {
+      console.error("Error deleting module:", err);
+      setError('Erro ao remover módulo.');
     }
   };
 
@@ -211,15 +233,26 @@ export const ContentManager: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Módulo de Destino</label>
-              <select 
-                value={selectedModule}
-                onChange={(e) => setSelectedModule(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-400 transition-all font-medium"
-              >
-                {modules.map(mod => (
-                  <option key={mod.id} value={mod.id}>{mod.title}</option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select 
+                  value={selectedModule}
+                  onChange={(e) => setSelectedModule(e.target.value)}
+                  className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-400 transition-all font-medium"
+                >
+                  {modules.map(mod => (
+                    <option key={mod.id} value={mod.id}>{mod.title}</option>
+                  ))}
+                </select>
+                {selectedModule !== 'eval' && selectedModule !== 'disorders' && (
+                  <button 
+                    onClick={(e) => handleDeleteModule(selectedModule, e)}
+                    className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-all border border-red-100"
+                    title="Remover Módulo"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                )}
+              </div>
             </div>
 
             <div>
@@ -285,8 +318,9 @@ export const ContentManager: React.FC = () => {
             <ul className="space-y-3 text-sm text-slate-600">
               <li>1. Carregue um documento PDF com conteúdo teórico.</li>
               <li>2. A IA extrai o texto e cria um **Tópico de Revisão** formatado.</li>
-              <li>3. São geradas **3 Questões de Simulado** exclusivas.</li>
-              <li>4. Você revisa e aprova a inserção no banco de dados.</li>
+              <li>3. São geradas **30 Questões Contextualizadas** exclusivas.</li>
+              <li>4. Híbrido: **V/F, Múltipla Escolha e Subjetivas**.</li>
+              <li>5. Você revisa e aprova a inserção no banco de dados.</li>
             </ul>
             <div className="mt-8 p-4 bg-white rounded-xl border border-slate-200">
               <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-2">Poder de processamento</p>
@@ -323,17 +357,37 @@ export const ContentManager: React.FC = () => {
             </div>
 
             {/* Questions Review */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {generatedQuestions.map((q, idx) => (
-                <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                  <div className="text-[10px] font-black text-indigo-600 uppercase mb-2">Questão {idx + 1}</div>
-                  <p className="text-sm font-bold text-slate-800 mb-4 line-clamp-3">{q.text}</p>
-                  <div className="space-y-2">
-                    {q.options.map((opt, i) => (
-                      <div key={i} className={`text-xs p-2 rounded-lg border ${i === q.correctAnswer ? 'bg-emerald-50 border-emerald-200 font-bold text-emerald-700' : 'bg-slate-50 border-slate-100 text-slate-500'}`}>
-                        {String.fromCharCode(65 + i)}) {opt}
-                      </div>
-                    ))}
+                <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="text-[10px] font-black text-indigo-600 uppercase">Questão {idx + 1}</div>
+                    <div className="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded-full font-bold uppercase">
+                      {q.type === 'objective' ? 'Objetiva' : q.type === 'true_false' ? 'V/F' : 'Subjetiva'}
+                    </div>
+                  </div>
+                  <p className="text-sm font-bold text-slate-800 mb-4 flex-1">{q.text}</p>
+                  
+                  {q.type !== 'subjective' ? (
+                    <div className="space-y-2 mb-4">
+                      {q.options.map((opt, i) => (
+                        <div key={i} className={`text-[10px] sm:text-xs p-2 rounded-lg border flex items-center gap-2 ${i === q.correctAnswer ? 'bg-emerald-50 border-emerald-200 font-bold text-emerald-700' : 'bg-slate-50 border-slate-100 text-slate-500'}`}>
+                          <span className="w-4 h-4 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[8px]">{String.fromCharCode(65 + i)}</span>
+                          {opt}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mb-4 text-xs italic text-slate-500">
+                      Resposta aberta sugerida na explicação abaixo.
+                    </div>
+                  )}
+
+                  <div className="mt-auto pt-4 border-t border-slate-100">
+                    <p className="text-[10px] text-emerald-600 font-bold mb-1 flex items-center gap-1">
+                      <HelpCircle size={10} /> Explicação:
+                    </p>
+                    <p className="text-[10px] text-slate-500 italic leading-relaxed">{q.explanation}</p>
                   </div>
                 </div>
               ))}
